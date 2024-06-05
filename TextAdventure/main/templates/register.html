@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        /*Modal function information*/
+        document.addEventListener("DOMContentLoaded", function() {
+
+/*This is to close the modal */
+    var closeModal = document.getElementsByClassName("close-modal")[0];
+    closeModal.onclick = function() {
+        var modal = document.getElementById("custom-modal");
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        var modal = document.getElementById("custom-modal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+});
+/*This function is to show the modal that lets the user 
+know that the password criteria has not been met */
+function showModal() {
+    var modal = document.getElementById("custom-modal");
+    modal.style.display = "block";
+}
+/*This is for the confirm password function */
+        document.addEventListener("DOMContentLoaded", function() {
+    var confirmPasswordField = document.getElementById("confirm_password");
+    confirmPasswordField.type = "password";
+/*This is for the eye-icon function */
+    var eyeIconConfirm = document.getElementById("eye-icon-confirm");
+    eyeIconConfirm.addEventListener("click", toggleConfirmPassword);
+    
+    eyeIconConfirm.classList.add("fa-eye-slash");
+});
+
+//For hiding password
+function toggleConfirmPassword() {
+    var confirmPasswordField = document.getElementById("confirm_password");
+    var eyeIconConfirm = document.getElementById("eye-icon-confirm");
+
+    if (confirmPasswordField.type === "password") {
+        confirmPasswordField.type = "text";
+        eyeIconConfirm.classList.remove("fa-eye-slash");
+        eyeIconConfirm.classList.add("fa-eye");
+    } else {
+        confirmPasswordField.type = "password";
+        eyeIconConfirm.classList.remove("fa-eye");
+        eyeIconConfirm.classList.add("fa-eye-slash");
+    }
+}
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var form = document.querySelector('form');
+ //This is an event listener for form submission
+            form.addEventListener('submit', function (event) {
+                var passwordInput = document.getElementById('password');
+                var passwordValue = passwordInput.value;
+                var confirmPasswordInput = document.getElementById('confirm_password');
+        var passwordValue = passwordInput.value;
+        var confirmPasswordValue = confirmPasswordInput.value;
+        var passwordError = document.getElementById('password_error');
+
+//This is for the confirm password function 
+                if (passwordValue !== confirmPasswordValue) {
+            passwordError.style.display = 'block'; 
+            event.preventDefault();
+        } else {
+               //Below is to check password requirements
+            passwordError.style.display = 'none'; 
+            if (passwordValue.length < 8 || !/[A-Z]/.test(passwordValue) || !/[!@#$%^&*(),.?":{}|<>]/.test(passwordValue)) {
+    showModal(); 
+    event.preventDefault();
+}
+
+}
+});
+});
+    </script>
+</head>
+<link rel="stylesheet" type="text/css" href="styles.css">
+<script type="text/javascript" src="script.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--This is for the registration title-->
+    <title>Registration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>
+        /*Styling*/
+        .reset-button {
+            margin-top: 20px;
+            padding: 15px 20px;
+            color: white;
+            background-color: black; 
+            border: 1px solid #ccc; 
+            border-radius: 4px;
+            cursor: pointer;
+            display: block; 
+            font-size: 24px;
+        }
+    /*This is for the settings pop-up styling */   
+        .settings-popup {
+            position: fixed;
+            top: 0;
+            right: -400px; 
+            width: 300px;
+            height: 100%;
+            background-color: black; 
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            transition: right 0.5s;
+            z-index: 1000;
+            padding: 20px; 
+            font-size: 18px; 
+            overflow-y: auto;
+            color: #ecf0f1; 
+        }
+        
+        .settings-popup.open {
+            right: 0;
+        }
+        
+        .settings-popup h2 {
+            color: #ecf0f1;
+            font-size: 24px; 
+            margin-bottom: 20px; 
+            text-align: center; 
+        }
+        
+        .settings-popup label {
+            display: block;
+            margin-bottom: 10px;
+            color: #ecf0f1; 
+        }
+        
+        .settings-popup input[type="color"],
+        .settings-popup select {
+            display: block;
+            width: 100%; 
+            margin-bottom: 20px; 
+            border: 1px solid #34495e;
+            background-color: #34495e;
+            color: #ecf0f1; 
+            padding: 10px; 
+            border-radius: 4px; 
+        }
+        /*The settings pop-up button styling*/
+        .settings-popup .button {
+            background-color: #16a085; 
+            color: white; 
+            text-transform: uppercase; 
+            font-weight: bold; 
+            border: none; 
+            border-radius: 4px; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            margin-bottom: 20px; 
+            width: 100%; 
+            box-sizing: border-box; 
+            transition: background-color 0.3s ease; 
+        }
+        /*This is for the settings pop-up hover feature */
+        .settings-popup .button:hover {
+            background-color: #1abc9c; 
+        }
+        
+        .settings-popup .close-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #c0392b; 
+            cursor: pointer;
+            font-size: 24px;
+        }
+        .close-button {
+            color: black;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        body, input, button, select, label {
+            font-size: 22px;
+            font-family: monospace;
+            color: white;
+        }
+        
+        label {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        input[type="text"], input[type="email"], input[type="password"], input[type="password"], select {
+            font-size: 20px;
+            padding: 15px;
+            margin: 10px 0;
+            color: black;
+        }
+        
+        button {
+            font-size: 24px;
+            padding: 15px 30px;
+        }
+        
+        .error-message, .forgot-links a {
+            font-size: 18px;
+        }
+        
+        @media (max-width: 768px) {
+            body, input, button, select, label {
+                font-size: 18px;
+            }
+            label {
+                font-size: 20px;
+            }
+            button {
+                font-size: 20px;
+            }
+        }
+        /*This is for the pulsing background behind the registration form*/
+        @keyframes pulseBackground {
+            0%, 100% {
+              box-shadow: 0 0 10px #e0a96d, 0 0 20px #e0a96d, 0 0 30px #e0a96d;
+              border-color: white;
+            }
+            50% {
+              box-shadow: 0 0 20px #d98b55, 0 0 40px #d98b55, 0 0 60px #d98b55;
+              border-color: white;
+            }
+          }
+        .custom-modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+/*These are the styling for the modal */
+.custom-modal-content {
+    background-color: #000; 
+    color: #fff; 
+    margin: 15% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+    font-size: 20px; 
+}
+
+
+
+.close-modal {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+/*This is for the closing of the modal*/
+.close-modal:hover,
+.close-modal:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+          .password-wrapper {
+                position: relative;
+           }
+
+/*This is the styling for the eye-icon for show/hide password*/
+.eye-icon {
+    position: absolute;
+    right: 5px;
+    top: 60%;
+    transform: translateY(-70%);
+    color: #666;
+    cursor: pointer;
+}
+          /*Below is the styling options for the settings pop-up*/
+          .settings-popup.open {
+            right: 0;
+          }
+          .close-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border: none;
+            background: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+          }
+        .settings-popup label,
+        .settings-popup select,
+        .settings-popup input[type="color"] {
+            display: block; 
+            margin-bottom: 10px;
+        }
+
+        .settings-popup label {
+            margin-top: 20px;
+        }
+
+        .settings-popup .close-popup {
+            font-size: 30px; 
+            line-height: 30px; 
+            width: 30px; 
+            height: 30px; 
+            text-align: center; 
+            border-radius: 15px; 
+            opacity: 0.6;
+        }
+
+        .settings-popup .close-popup:hover {
+            opacity: 1;
+        }
+        .menu-bar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px;
+    list-style: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 20px;
+    z-index: 1000;
+}
+/*These are the styling options for the menu bar*/
+.menu-bar a {
+    color: white;
+    padding: 20px 40px;
+    text-decoration: none;
+    margin: 0 10px;
+    border: 2px solid white; 
+    border-radius: 40px;
+    transition: background-color 0.3s;
+    font-size: 28px;
+}
+
+.menu-bar a:hover {
+    background-color: #007bff;
+}
+        .button-container {
+            font-size: 20px;
+            display: flex;
+            justify-content: space-around;
+            margin-top: 100px;
+            justify-content: flex-start;
+
+            
+        }
+
+        .button-container a {
+            margin: 0 5px;
+            text-decoration: none;
+            color: white;
+            padding: 10px 15px;
+            background-color: lightblue;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .button-container a:hover {
+            background-color: #333;
+        }
+
+        body { 
+            font-family: monospace;
+            text-align: left;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: rgb(15, 19, 27);
+            font-size: 22px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #fff;
+            overflow: auto
+        }
+
+        form {
+            margin: 125px auto 50px;
+            width: 600px;
+            padding: 60px;
+            color: #fff; 
+            font-size: 25px;
+            max-width: 600px; 
+            padding: 40px;
+            border: 2px solid #e0a96d; 
+            box-shadow: 0 0 20px #e0a96d, 0 0 30px #d98b55, 0 0 45px #e0a96d; 
+            border-radius: 10px; 
+            background-color: black; 
+            animation: pulseBackground 2s infinite; 
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-shadow: 1px 1px 1px black;
+            font-size: 20px;
+            float: left;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+
+        a {
+            text-shadow: 1px 1px 1px black;
+        }
+    #eye-icon {
+        position: relative;
+        left: 560px; 
+        top: -50px; 
+        color: black;
+        right: 100px;
+    }
+    #hamburger-icon {
+        display: none;
+        cursor: pointer;
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px;
+    }
+    
+    #hamburger-icon span {
+        display: block;
+        width: 30px;
+        height: 3px;
+        background-color: white;
+    }
+    
+    #menu-items {
+        display: flex; 
+        gap: 10px;
+    }
+    /*This is for the hamburger menu */
+    @media (max-width: 768px) {
+        #hamburger-icon {
+            display: flex; 
+        }
+        
+        #menu-items {
+            display: none; 
+            flex-direction: column;
+            position: absolute;
+            background-color: #333;
+            top: 60px;
+            right: 0;
+            width: 100%;
+        }
+        .menu-bar {
+            justify-content: space-between;
+        }
+        
+        #menu-items.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #333;
+            position: fixed;
+            top: 60px; 
+            right: 0;
+            width: 100%; 
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+        }
+    }
+    
+
+
+
+
+    </style>
+<body>
+    <!--Fields for user information input-->
+    <form action="{% url 'register' %}" method="post">
+        {% csrf_token %}
+        <!--This is for the form of User Registration with the email, username
+        password and confirm password.-->
+        <h2>User Registration</h2>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <span id="eye-icon" class="fas fa-eye" style="cursor: pointer;"></span>
+        
+        <div class="password-wrapper">
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+            <span id="eye-icon-confirm" class="eye-icon fas fa-eye" style="margin-top: 2%; cursor: pointer;"></span>
+        </div>
+        <span id="password_error" style="color: red; display: none;">Passwords don't match</span>
+        
+
+        <!--Password requirements-->
+        <p>Password must:</p>
+        <ul>
+            <li>Be at least 8 characters long</li>
+            <li>Contain at least one special character</li>
+            <li>Contain at least one capital letter</li>
+        </ul>
+    </div>
+        <button type="submit">Register</button>
+        <div class="">
+
+    </form>
+    <div class="menu-bar">
+        <div id="hamburger-icon" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <!--Nav Bar-->
+    <div id="menu-items">
+        <a href="{% url 'index' %}">Home</a>
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'register' %}">Register</a>
+        <a href="#" id="settings-button" class="menu-item">Settings</a>
+    </div>
+
+    <div id="settings-popup" class="settings-popup">
+        <button id="close-popup" class="close-popup">&times;</button>
+        <h2>Settings</h2>
+        <!--These are the setting pop-up for background color-->
+        <div class="setting">
+            <label for="bg-color">Background Color:</label>
+            <input type="color" id="bg-color" onchange="changeBackgroundColor(this.value)" value="#222">
+        </div>
+        <!--These are the pop-up setting font family options-->
+        <div class="setting">
+            <label for="font-family">Font Family:</label>
+            <select id="font-family" onchange="changeFontFamily(this.value)">
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="Times New Roman, serif">Times New Roman</option>
+                <option value="Courier New, monospace">Courier New</option>
+            </select>
+        </div>
+        <!--These are the pop-up setting font options-->
+        <div class="setting">
+            <label for="font-size">Font Size:</label>
+            <select id="font-size" onchange="changeFontSize(this.value)">
+                <option value="12px">12px</option>
+                <option value="14px">14px</option>
+                <option value="16px">16px</option>
+                <option value="18px">18px</option>
+                <option value="19px">19px</option>
+                <option value="20px">20px</option>
+                <option value="21px">21px</option>
+                <option value="22px">22px</option>
+            </select>
+        </div>
+        <div class="setting">
+            <button id="reset-button" class="reset-button">Reset</button>
+        </div>
+        <div class="setting">
+            <button id="save-button" class="reset-button">Save</button>
+            <p id="save-confirmation" style="color: limegreen; margin-top: 10px; display: none;">Settings saved!</p>
+        </div>
+    </div>
+      </div>
+<!--These are the content/words that the modal is going to have.-->
+      <div id="custom-modal" class="custom-modal">
+        <div class="custom-modal-content">
+            <span class="close-modal">&times;</span>
+            <p>Password must be at least 8 characters long and contain at least one special character and one capital letter.</p>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        applySavedSettings();
+        var passwordField = document.getElementById("password");
+        passwordField.type = "password";
+
+        var eyeIcon = document.getElementById("eye-icon");
+        eyeIcon.addEventListener("click", togglePassword);
+        
+        eyeIcon.classList.add("fa-eye-slash");
+
+        document.getElementById('settings-button').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('settings-popup').classList.toggle('open');
+        });
+        document.getElementById('close-popup').addEventListener('click', function() {
+            document.getElementById('settings-popup').classList.remove('open');
+        });
+        var resetButton = document.getElementById('reset-button');
+        resetButton.addEventListener('click', function() {
+            window.location.reload();
+        });
+        document.getElementById('save-button').addEventListener('click', saveSettings);
+    function applySavedSettings() {
+            const savedBgColor = localStorage.getItem('bgColor');
+            const savedFontFamily = localStorage.getItem('fontFamily');
+            const savedFontSize = localStorage.getItem('fontSize');
+        
+            if (savedBgColor) {
+                changeBackgroundColor(savedBgColor);
+            }
+            if (savedFontFamily) {
+                changeFontFamily(savedFontFamily);
+            }
+            if (savedFontSize) {
+                changeFontSize(savedFontSize);
+            }
+        }
+        document.getElementById('reset-button').addEventListener('click', function() {
+            localStorage.removeItem('bgColor');
+            localStorage.removeItem('fontFamily');
+            localStorage.removeItem('fontSize');
+            resetUI();
+        });
+    });
+    //This is for the savesettings function for the background color, font family
+    function saveSettings() {
+        const bgColor = document.getElementById('bg-color').value;
+        const fontFamily = document.getElementById('font-family').value;
+        const fontSize = document.getElementById('font-size').value;
+    
+        localStorage.setItem('bgColor', bgColor);
+        localStorage.setItem('fontFamily', fontFamily);
+        localStorage.setItem('fontSize', fontSize);
+    
+        const confirmationMessage = document.getElementById('save-confirmation');
+        confirmationMessage.textContent = "Settings saved!";
+        confirmationMessage.style.display = "block";
+    
+        setTimeout(() => {
+            confirmationMessage.style.display = "none";
+        }, 3000); 
+    }
+    
+
+    function togglePassword() {
+        var passwordField = document.getElementById("password");
+        var eyeIcon = document.getElementById("eye-icon");
+
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            eyeIcon.classList.remove("fa-eye-slash");
+            eyeIcon.classList.add("fa-eye");
+        } else {
+            passwordField.type = "password";
+            eyeIcon.classList.remove("fa-eye");
+            eyeIcon.classList.add("fa-eye-slash");
+        }
+    }
+      //Function to change background color
+      function changeBackgroundColor(color) {
+            document.body.style.backgroundColor = color;
+        }
+
+        //Function to change font color
+        function changeFontColor(color) {
+            document.body.style.color = color;
+        }
+
+        //Function to change font family
+        function changeFontFamily(font) {
+            document.body.style.fontFamily = font;
+        }
+
+        function changeFontSize(size) {
+        document.body.style.fontSize = size;
+        // Change font size for specific elements
+        document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, label, button').forEach(element => {
+            element.style.fontSize = size;
+        });
+    }
+    //This is for the reset function back to default
+    function resetUI() {
+        const defaultBgColor = '#222'; 
+        const defaultFontFamily = 'Arial, sans-serif'; 
+        const defaultFontSize = '16px'; 
+    
+        changeBackgroundColor(defaultBgColor);
+        document.getElementById('bg-color').value = defaultBgColor;
+        changeFontFamily(defaultFontFamily);
+        document.getElementById('font-family').value = defaultFontFamily;
+        changeFontSize(defaultFontSize);
+        document.getElementById('font-size').value = defaultFontSize;    
+        document.getElementById('save-confirmation').style.display = "none";
+    }
+    function toggleMenu() {
+        var menuItems = document.getElementById("menu-items");
+        menuItems.classList.toggle("active");
+    }
+</script>
+
+</body>
+
+</html>
+

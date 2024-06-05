@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shattered Rails</title>
+    <style>
+/*Styling for the game*/
+        .save-button {
+            margin-top: 10px;
+            padding: 15px 20px;
+            color: white;
+            background-color: green; 
+            border: 1px solid #ccc; 
+            border-radius: 4px;
+            cursor: pointer;
+            display: block; 
+            font-size: 24px;
+        }
+        .reset-button {
+            margin-top: 20px;
+            padding: 15px 20px;
+            color: white;
+            background-color: red; 
+            border: 1px solid #ccc; 
+            border-radius: 4px;
+            cursor: pointer;
+            display: block; 
+            font-size: 24px;
+        }
+            
+        .settings-popup {
+            position: fixed;
+            top: 0;
+            right: -400px; 
+            width: 300px;
+            height: 100%;
+            background-color: black; 
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            transition: right 0.5s;
+            z-index: 1000;
+            padding: 20px; 
+            font-size: 18px; 
+            overflow-y: auto;
+            color: #ecf0f1; 
+        }
+        
+        .settings-popup.open {
+            right: 0;
+        }
+        
+        .settings-popup h2 {
+            color: #ecf0f1;
+            font-size: 24px; 
+            margin-bottom: 20px; 
+            text-align: center; 
+        }
+        
+        .settings-popup label {
+            display: block;
+            margin-bottom: 10px;
+            color: #ecf0f1; 
+        }
+        
+        .settings-popup input[type="color"],
+        .settings-popup select {
+            display: block;
+            width: 100%; 
+            margin-bottom: 20px; 
+            border: 1px solid #34495e;
+            background-color: #34495e;
+            color: #ecf0f1; 
+            padding: 10px; 
+            border-radius: 4px; 
+        }
+        
+        .settings-popup .button {
+            background-color: #16a085; 
+            color: white; 
+            text-transform: uppercase; 
+            font-weight: bold; 
+            border: none; 
+            border-radius: 4px; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            margin-bottom: 20px; 
+            width: 100%; 
+            box-sizing: border-box; 
+            transition: background-color 0.3s ease; 
+        }
+        
+        .settings-popup .button:hover {
+            background-color: #1abc9c; 
+        }
+        
+        .settings-popup .close-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #c0392b; 
+            cursor: pointer;
+            font-size: 24px;
+        }
+        .close-button {
+            color: black;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .terminal-container {
+            position: relative;
+            background-color: #121212; 
+            padding: 20px; 
+            margin-top: 20px; 
+            border: 2px solid #89cff0; 
+            animation: pulseBackground 2s infinite; 
+
+            box-sizing: border-box;
+            width: 100%;
+        }
+        
+        
+        @keyframes pulseBackground {
+            0%, 100% {
+                box-shadow: 0 0 10px #89cff0, 0 0 20px #89cff0, 0 0 30px #89cff0;
+                border-color: #89cff0;
+            }
+            50% {
+                box-shadow: 0 0 20px #d98b55, 0 0 40px #d98b55, 0 0 60px #d98b55;
+                border-color: #d98b55;
+            }
+        }
+        body {
+            font-family: monospace;
+            background-color: rgb(15, 19, 27);
+            overflow-x: hidden;
+            height: 100vh;
+            
+            justify-content: center;
+            align-items: center; 
+
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar {
+            width: 15%;
+            background-color: rgb(20, 25, 36);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+        }
+                       .sidebar.active {
+            transform: translateX(0); 
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 40%; 
+            }
+
+            .content, .terminal-container {
+                width: 100%; 
+                padding: 10px; 
+            }
+
+
+            .menu-bar a, .button, .logout-button, .help-button {
+                font-size: smaller; 
+            }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 60%; 
+                transform: translateX(-100%); 
+            }
+            
+            .content {
+                margin-top: 20px; 
+            }
+
+            .terminal-container {
+                max-height: 200px; 
+            }
+        }
+
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 10; 
+            left: 0;
+            top: 50%; 
+            width: 100%; 
+            height: 100%; 
+            overflow: none; 
+            background-color: rgba(0,0,0,0.4); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+
+        .modal button {
+            border-radius: 15px;
+            font-size: 15px;
+            width: 20%;
+            height: 30%;
+            cursor: pointer;
+        }
+
+        .modal button:hover {
+            background-color: #007bff;
+        }
+
+        .modal-content {
+            position: relative; 
+            margin: auto; 
+            padding: 50px;
+            border: 0.5px solid #FFA500; 
+            width: 50%; 
+            max-width: 600px; 
+            background-color: #000; 
+            color: white; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19); 
+            border-radius: 10px;
+            transform: translateY(-50%);
+        }
+
+            .modal-content::before {
+                content: '';
+                position: absolute;
+                top: -2px;
+                right: -2px;
+                bottom: -2px;
+                left: -2px;
+                z-index: -1;
+                background: linear-gradient(40deg, #FFA500, #FFD700, #FFA500);
+                background-size: 200% 200%;
+                animation: gradient-border 2s linear infinite;
+                border-radius: 10px;
+                filter: blur(5px);
+            }
+
+            @keyframes gradient-border {
+                0% {
+                    background-position: 0 50%;
+                }
+                50% {
+                    background-position: 100% 50%;
+                }
+                100% {
+                    background-position: 0 50%;
+                }
+            }
+
+            .confirm-button {
+                background-color: black;
+                color: black;
+                padding: 10px 20px;
+                border: none;
+                cursor: pointer;
+                border-radius: 5px;
+                margin: 5px;
+                transition: background-color 0.3s ease;
+            }
+            .modal {
+                display: flex; 
+                align-items: center; 
+                justify-content: center; /
+            }
+
+
+
+        .black-font {
+            color: black;
+        }
+        #restartModal .black-font {
+            color: black !important;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px 20px;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+        }
+
+        .sidebar a:hover {
+            background-color: rgb(50, 60, 70);
+            color: rgb(235, 190, 190);
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            color: white;
+            width: 85%;
+        }
+
+        .menu-bar {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px;
+            list-style: none;
+            
+            
+        }
+
+        .menu-bar a {
+            color: white;
+            padding: 20px 40px;
+            text-decoration: none;
+            margin: 0 10px;
+            border: 2px solid white;
+            border-radius: 40px;
+            transition: background-color 0.3s;
+        }
+
+        .menu-bar a:hover {
+            background-color: #007bff;
+        }
+
+        .center-title {
+            text-align: center;
+        }
+
+        .terminal-container {
+            
+            width: 100%;
+            height: 60%;
+            background-color: rgb(38, 38, 38); 
+            
+            border-radius: 10px;
+            overflow: auto;
+
+            display: flex;
+            justify-content: center; 
+            align-items: center; 
+            box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.75);
+
+        }
+
+@keyframes glowPulse {
+    0%, 100% {
+        box-shadow: 
+            0 0 10px 0 rgba(255, 255, 255, 0.5), 
+            0 0 20px 10px rgba(255, 255, 255, 0.3), 
+            0 0 30px 20px rgba(255, 255, 255, 0.1);
+    }
+    50% {
+        box-shadow: 
+            0 0 15px 5px rgba(255, 255, 255, 0.75), 
+            0 0 25px 15px rgba(255, 255, 255, 0.5), 
+            0 0 35px 25px rgba(255, 255, 255, 0.25);
+    }            
+        }
+
+        .terminal-text,
+        button {
+            text-align: center;
+            color: #FFFFFF;
+            font-size: 30px;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .logout-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 120px;
+            height: 40px;
+            background-color: blue;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            font-family: 'Arial', sans-serif;
+            border: 1px solid darkgrey;
+            box-shadow: 0.5px 0.5px 2px darkgrey;
+        }
+
+        .speed-slider, .line-spacing-picker {
+            width: 100px;
+            margin: 20px auto;
+        }
+
+        .help-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 8%;
+            height: 6%;
+            background-color: orange;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            
+            border: 1px solid darkgrey;
+            box-shadow: 0.5px 0.5px 2px darkgrey;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .help-button:hover {
+            background-color: rgb(184, 124, 11);
+        }
+
+        
+        .buttons-container {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .label-highlight {
+            background-color: white;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .profile-icon {
+            width: 50px;
+            height: 50px;
+        }
+
+        .button 
+        {
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            margin: 0 10px;
+            border: 2px solid white; 
+            border-radius: 20px; 
+            transition: background-color 0.3s;
+            background-color: rgb(15, 19, 27); 
+            font-size: 16px; 
+            display: inline-block; 
+            cursor: pointer; 
+            text-align: center; 
+            font-family: 'Arial', sans-serif; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); 
+        }
+
+        label
+        {
+            color: white;
+            padding: 10px;
+            font-size: 15px; 
+            display: inline-block; 
+            text-align: center; 
+            font-family: 'Arial', sans-serif; 
+
+        }
+        .button:hover {
+            background-color: #007bff; 
+        }
+
+        .name-input {
+            display: flex;
+            justify-content: center;
+            
+        }
+        body {
+            transition: background-image 0.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .fading-background {
+            animation: fadeBackground 2s ease-in-out forwards;
+        }
+        
+        @keyframes fadeBackground {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        #hamburger-icon {
+            display: none;
+            cursor: pointer;
+            flex-direction: column;
+            gap: 5px;
+            padding: 10px;
+        }
+        
+        #hamburger-icon span {
+            display: block;
+            width: 30px;
+            height: 3px;
+            background-color: white;
+        }
+        
+        #menu-items {
+            display: flex; 
+            gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            #hamburger-icon {
+                display: flex; 
+            }
+            
+            #menu-items {
+                display: none; 
+                flex-direction: column;
+                position: absolute;
+                background-color: #333;
+                top: 60px;
+                right: 0;
+                width: 100%;
+            }
+            .menu-bar {
+                justify-content: space-between;
+            }
+            
+            #menu-items.active {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background-color: #333; 
+                position: fixed;
+                top: 60px;
+                right: 0;
+                width: 100%; 
+                padding: 10px; 
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="menu-bar">
+        <a href="{% url 'index' %}">Home</a>
+        <a href="{% url 'profile' %}">Profile</a>
+        <a href="{% url 'index_2' %}">Game Selection</a>
+        <a href="{% url 'logout' %}">Logout</a>
+        <a href="#" id="settings-button" class="menu-item">Settings</a>    
+    </div>
+    <div id="settings-popup" class="settings-popup">
+        <button id="close-popup" class="close-popup">&times;</button>
+        <h2>Settings</h2>
+        
+        <div class="setting">
+            <label for="background-color-picker">Background Color:</label>
+            <input type="color" id="background-color-picker" value="#121212">
+        </div>
+        
+        <div class="setting">
+            <label for="font-family-picker">Font Family:</label>
+            <select id="font-family-picker">
+                <option value="Arial">Arial</option>
+                <option value="Impact">Impact</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Comic Sans MS">Comic Sans MS</option>
+                <option value="Tahoma">Tahoma</option>
+                <option value="Lucida Console">Lucida Console</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Garamond">Garamond</option>
+                <option value="Trebuchet MS">Trebuchet MS</option>
+                <option value="Book Antiqua">Book Antiqua</option>
+                <option value="Century Gothic">Century Gothic</option>
+                <option value="Calibri">Calibri</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Arial Black">Arial Black</option>
+            </select>
+        </div>
+        
+        <div class="setting">
+            <label for="font-size">Font Size:</label>
+            <select id="font-size" onchange="changeFontSize(this.value)">
+                <option value="12px">12px</option>
+                <option value="14px">14px</option>
+                <option value="16px">16px</option>
+                <option value="18px">18px</option>
+                <option value="19px">19px</option>
+                <option value="20px">20px</option>
+                <option value="21px">21px</option>
+                <option value="22px">22px</option>
+            </select>
+        </div>
+
+        <label for="speed-slider">Text Speed:</label>
+        <input type="range" min="1" max="100" value="20" class="speed-slider" id="speed-slider" style="background-color: red;">
+
+        
+        <label for="font-color-picker">Font Color:</label>
+        <input type="color" id="font-color-picker" value="#d4af37">
+    
+        <label for="terminal-background-color-picker">Terminal Background Color:</label>
+        <input type="color" id="terminal-background-color-picker" value="#121212">
+    
+        <div class="setting">
+            <button id="reset-button" class="reset-button">Reset</button>
+        </div>
+        <div class="setting">
+            <button id="save-button" class="save-button">Save the changes</button>
+            <p id="save-confirmation" style="color: limegreen; margin-top: 10px; display: none;">Settings saved!</p>
+        </div>
+        <div class ="setting">
+            <label for="line-spacing-picker">Line Spacing:</label>
+        <input type="range" min="1" max="3" step="0.1" value="1" class="line-spacing-picker" id="line-spacing-picker">
+            
+        <label for="speechToggle">Speech:</label>
+        <input type="checkbox" id="speechToggle" style="margin-bottom: 20px;">
+
+        <div class="buttons-container">
+            <button class="button" onclick="toggleBold()">Bold</button>
+        </div>
+        <div class="buttons-container">
+            <button class="button" onclick="zoomIn()" style="margin-left: 10px;">+</button>
+        </div>
+        <div class="buttons-container">
+            <button class="button" onclick="zoomOut()" style="margin-left: 10px;">-</button>
+        </div>
+        <div class="buttons-container">
+            <button class="button" onclick="Underline()">Underline</button>
+        </div>
+        <div class="buttons-container">
+            <button class="button" onclick="Italics()">Italics</button>
+        </div>
+        <div class="buttons-container">
+            <button class="button" id="align-left" style="margin-left: 10px;">Align Left</button>
+        </div>
+        <div class="buttons-container">
+            <button class="button" id="align-center" style="margin-left: 10px;">Align Center</button>
+        </div>
+        <div class="buttons-container">
+            <button class="button" id="align-right" style="margin-left: 10px;">Align Right</button>
+        </div>
+    </div>
+      </div>
+
+    <div>
+        {% if user.is_authenticated %}
+        
+        <div id="restartModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <p>Are you sure you want to restart the game?</p>
+                <button class="black-font" onclick="confirmRestart()">Yes, restart</button>
+                <button class="black-font" onclick="closeModal()">No, cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="terminal-container">
+        <div class='terminal-text' id="output">
+        </div>
+    </div>
+    <div class="buttons-container">
+        <button class="button" id="pauseButton" onclick="pause()">Pause</button>
+        <button class="button" onclick="restartGame()">Restart Game</button>
+    </div>
+    <div class="buttons-container" id="button-container"></div>
+    
+    <div class="name-input" id="name-input-container"></div>
+
+    <a class="help-button" href="{% url 'help' %}">Help</a>
+
+    <script>
+//Speed slider function
+        let name;
+        let textSpeed = 20;
+        let fontSize = 30;
+
+        document.getElementById("speed-slider").addEventListener("input", function () {
+            textSpeed = this.value;
+            this.style.backgroundColor = 'red';
+        });
+
+        let pauseStatus = false;
+        
+//Pause function, when the user clicks pause, the text freezes, until the user clicks resume, when in the text resumes.
+
+function pause() {
+    pauseStatus = !pauseStatus;
+    const pauseButton = document.getElementById("pauseButton");
+    if (pauseStatus) {
+        pauseButton.textContent = "Resume";
+    } else {
+        pauseButton.textContent = "Pause";
+    }
+}
+        const lavaImageUrl = "{% static 'main/images/lava.jpg' %}";
+        const iceImageUrl = "{% static 'main/images/ice.jpg' %}";
+        const lightningImageUrl = "{% static 'main/images/lightning.jpg' %}";
+        const swagKingImageUrl = "{% static 'main/images/swagking.jpg' %}";
+        const darkImageUrl = "{% static 'main/images/dark.jpg' %}";
+
+//Function to change the background to lava
+function changeBackgroundToLava() {
+    document.body.style.backgroundImage = `url('${lavaImageUrl}')`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.classList.add('fading-background');
+    setTimeout(() => document.body.classList.remove('fading-background'), 2000);
+}
+
+//Function for animations
+async function animNarrate(message, gifUrl, imageWidth, imageHeight) {
+    const terminalContainer = document.querySelector('.terminal-container');
+    const overlayContainer = document.createElement('div');
+    overlayContainer.innerHTML = `
+        <div style="text-align: center; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: 9999;">
+            <p>${message}</p>
+            <img src="${gifUrl}" alt="gif" style="width: ${imageWidth}px; height: ${imageHeight}px;" />
+        </div>`;
+    overlayContainer.style.position = 'fixed';
+    overlayContainer.style.top = '0';
+    overlayContainer.style.left = '0';
+    overlayContainer.style.width = '100vw';
+    overlayContainer.style.height = '100vh';
+    overlayContainer.style.display = 'flex';
+    overlayContainer.style.justifyContent = 'center';
+    overlayContainer.style.alignItems = 'center';
+    overlayContainer.style.zIndex = '9999';
+
+    document.body.appendChild(overlayContainer);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    overlayContainer.remove();
+}
+
+//Function to play sounds
+async function playSound(soundLocation) {
+    try {
+        
+        var sound = new Audio(soundLocation);
+        await sound.play();
+    } catch (error) {
+        
+        console.error("Error playing the sound:", error);
+    }
+}
+
+//Function to change the background to Ice
+function changeBackgroundToIce() {
+            document.body.style.backgroundImage = `url('${iceImageUrl}')`;
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+            document.body.classList.add('fading-background');
+            setTimeout(() => document.body.classList.remove('fading-background'), 2000);
+        }
+
+//Function to change the background to Lightning
+
+        function changeBackgroundToLightning() 
+        {
+            document.body.style.backgroundImage = `url('${lightningImageUrl}')`;
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+            document.body.classList.add('fading-background');
+            setTimeout(() => document.body.classList.remove('fading-background'), 2000);
+        }
+
+//Function to change the background to SwagKing
+        function changeBackgroundToSwagKing() 
+        {
+            document.body.style.backgroundImage = `url('${swagKingImageUrl}')`;
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+            document.body.classList.add('fading-background');
+            setTimeout(() => document.body.classList.remove('fading-background'), 2000);
+        }
+
+//Function to change the background to Dark
+        function changeBackgroundToDark() {
+            document.body.style.backgroundImage = `url('${darkImageUrl}')`;
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+            document.body.classList.add('fading-background');
+            setTimeout(() => document.body.classList.remove('fading-background'), 2000);
+        }
+//Function that generates buttons for every prompt
+    async function promptChoice(inputText, choices) {
+        return new Promise(resolve => {
+            const containButton = document.getElementById("button-container");
+            containButton.innerHTML = "";
+            narrate(inputText);
+            const colors = ["#555555", "#555555", "#555555", "#555555", "#555555"];
+            choices.forEach((option, index) => {
+                const button = document.createElement("button");
+                button.textContent = option.label;
+                button.className = 'button';
+                button.style.backgroundColor = colors[index % colors.length];
+                button.style.color = 'white'; 
+                button.onclick = () => resolve(option.value);
+                
+                if(option.label === "Fire King Nayvadius") {
+                    button.addEventListener('click', changeBackgroundToLava);
+                } else if (option.label === "Ice Queen Cartilana") {
+                        button.addEventListener('click', changeBackgroundToIce);
+                    } else if (option.label === "Lightning Queen Kajal") {
+                        button.addEventListener('click', changeBackgroundToLightning);
+                    } else if (option.label === "Swag King Cash Barti") {
+                        button.addEventListener('click', changeBackgroundToSwagKing);
+                    } else if (option.label === "Darkness King Alvin") {
+                        button.addEventListener('click', changeBackgroundToDark);                    
+                }
+
+                containButton.appendChild(button);
+            });
+        });
+    }
+
+
+
+//Function for text delay
+        async function narrate(script) {
+            return new Promise(resolve => {
+                let start = 0;
+                const outputDiv = document.getElementById("output");
+                const contTerm = document.querySelector(".terminal-container");
+                const speechEnabled = document.getElementById("speechToggle").checked;
+                const cleanScript = script.replace(/={3,}/g, ", ");
+                
+                if ('speechSynthesis' in window && speechEnabled) {
+                    const utterance = new SpeechSynthesisUtterance(script);
+                    window.speechSynthesis.speak(utterance);
+                }
+                else {
+                    console.error("Speech sythesis not supported");
+                }
+                const intervalId = setInterval(() => 
+                {
+                    if (!pauseStatus)
+                 {
+                    outputDiv.innerHTML += script[start];
+                    contTerm.scrollTop = contTerm.scrollHeight;
+
+                    start += 1;
+                    if (start === script.length) {
+                        clearInterval(intervalId);
+                        outputDiv.innerHTML += '<br><br>';
+                        contTerm.scrollTop = contTerm.scrollHeight;
+                        resolve();
+                    }
+                 }
+                }, textSpeed);
+
+            });
+
+            
+        }
+
+        let gameMode;
+        function toggleBold() {
+            const terminalText = document.querySelector('.terminal-text');
+            terminalText.style.fontWeight = (terminalText.style.fontWeight === 'bold') ? 'normal' : 'bold';
+        }
+
+function loadPreferences() {
+    const terminalBgColor = localStorage.getItem('terminalBgColor') || '#121212'; 
+    const fontColor = localStorage.getItem('fontColor') || '#FFFFFF'; 
+
+    const terminalElement = document.querySelector('.terminal-container');
+    terminalElement.style.backgroundColor = terminalBgColor;
+
+    const textElements = document.querySelectorAll('.terminal-text');
+    textElements.forEach(element => {
+        element.style.color = fontColor;
+    });
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('terminal-background-color-picker').addEventListener('input', function() {
+        const color = this.value;
+        localStorage.setItem('terminalBgColor', color);
+        document.querySelector('.terminal-container').style.backgroundColor = color;
+    });
+
+    document.getElementById('font-color-picker').addEventListener('input', function() {
+        const color = this.value;
+        localStorage.setItem('fontColor', color);
+        document.querySelectorAll('.terminal-text').forEach(element => {
+            element.style.color = color;
+        });
+    });
+
+  
+    loadPreferences();
+});
+
+        function zoomIn() {
+            fontSize += 2;
+            document.querySelector('.terminal-text').style.fontSize = fontSize + 'px';
+        }
+
+        function zoomOut() {
+            fontSize -= 2;
+            document.querySelector('.terminal-text').style.fontSize = fontSize + 'px';
+        }
+        
+        async function restartGame() {
+                const restart = confirm("Are you sure you want to restart the game?");
+                if (restart) {
+                    location.reload();
+                }
+            }
+
+function Underline() {
+    const terminalText = document.querySelector('.terminal-text');
+    const currentStyle = window.getComputedStyle(terminalText).textDecoration;
+    const newStyle = (currentStyle === 'none' || currentStyle === '') ? 'underline' : 'none';
+    terminalText.style.textDecoration = newStyle;
+}
+
+
+function loadPreferences() {
+    const terminalText = document.querySelector('.terminal-text');
+    const terminalContainer = document.querySelector('.terminal-container');
+
+    terminalText.style.color = localStorage.getItem('fontColor') || '#FFFFFF';
+    terminalText.style.fontFamily = localStorage.getItem('fontFamily') || 'Arial';
+    terminalContainer.style.backgroundColor = localStorage.getItem('terminalBgColor') || '#121212';
+    terminalText.style.fontSize = `${localStorage.getItem('fontSize') || '30'}px`;
+    terminalText.style.lineHeight = localStorage.getItem('lineHeight') || 'normal';
+    textSpeed = localStorage.getItem('textSpeed') || '20'; 
+}
+
+
+document.getElementById('align-left').addEventListener('click', function() {
+    document.querySelector('.terminal-text').style.textAlign = 'left';
+});
+
+document.getElementById('align-center').addEventListener('click', function() {
+    document.querySelector('.terminal-text').style.textAlign = 'center';
+});
+
+document.getElementById('align-right').addEventListener('click', function() {
+    document.querySelector('.terminal-text').style.textAlign = 'right';
+});
+
+function resetSettings() {
+
+    localStorage.removeItem('terminalBgColor');
+    localStorage.removeItem('fontColor');
+
+
+    const defaultTerminalBgColor = '#121212';
+    document.querySelector('.terminal-container').style.backgroundColor = defaultTerminalBgColor;
+    document.getElementById('terminal-background-color-picker').value = defaultTerminalBgColor;
+
+
+    const defaultFontColor = '#FFFFFF';
+    document.querySelectorAll('.terminal-text').forEach(element => {
+        element.style.color = defaultFontColor;
+    });
+    document.getElementById('font-color-picker').value = defaultFontColor;
+
+
+}
+
+
+document.getElementById('reset-button').addEventListener('click', resetSettings);
+
+
+function Italics() {
+    const terminalText = document.querySelector('.terminal-text');
+    const currentStyle = window.getComputedStyle(terminalText).fontStyle;
+    const newStyle = (currentStyle === 'normal' || currentStyle === '') ? 'italic' : 'normal';
+    terminalText.style.fontStyle = newStyle;
+}
+function changeBackgroundColorToRed() {
+    document.body.style.backgroundColor = 'red';
+}
+
+function restartGame() {
+    var modal = document.getElementById("restartModal");
+    modal.style.display = "block";
+    pauseStatus = true; 
+}
+
+function closeModal() {
+    var modal = document.getElementById("restartModal");
+    modal.style.display = "none";
+    pauseStatus = false; 
+}
+
+
+// Close the modal if the user clicks anywhere outside of it
+window.onclick = function(event) {
+    var modal = document.getElementById("restartModal");
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+function confirmRestart() {
+    closeModal();
+
+
+    resetGameState();
+
+
+
+    console.log("Game restarted"); 
+}
+
+function closeModal() {
+    var modal = document.getElementById("restartModal");
+    modal.style.display = "none";
+    pauseStatus = false; 
+}
+function confirmRestart() {
+    // Close the modal first
+    closeModal();
+
+    window.location.reload();
+
+}
+
+
+function zoomIn() {
+    let currentSize = parseInt(document.querySelector('.terminal-text').style.fontSize.replace('px', ''));
+    currentSize += 2;
+    document.querySelector('.terminal-text').style.fontSize = `${currentSize}px`;
+    savePreferences(); 
+}
+
+function zoomOut() {
+    let currentSize = parseInt(document.querySelector('.terminal-text').style.fontSize.replace('px', ''));
+    currentSize = Math.max(currentSize - 2, 8); 
+    document.querySelector('.terminal-text').style.fontSize = `${currentSize}px`;
+    savePreferences(); 
+}
+
+
+let isPaused = false;
+//This is the function for speech recognition
+if ('webkitSpeechRecognition' in window) {
+    var recognition = new webkitSpeechRecognition();
+    recognition.continuous = true; 
+    recognition.lang = 'en-US';
+    recognition.start();
+
+    recognition.onresult = function(event) {
+        var transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+        switch (transcript) {
+            case 'zoom in':
+                zoomIn();
+                break;
+            case 'zoom out':
+                zoomOut();
+                break;
+            case 'pause':
+                pause();
+                break;
+            case 'unpause':
+                pause(); 
+                break;
+            case 'bold':
+                toggleBold();
+                break;
+            case 'reverse bold':
+                toggleBold(); 
+                break;
+            case 'restart game':
+                restartGame(); 
+                break;
+            default:
+                console.log('Unrecognized command:', transcript);
+        }
+    };
+
+    //This is to restart the recognition when it ends
+    recognition.onend = function() {
+        recognition.start();
+    };
+} else {
+    console.log('Speech recognition not supported in this browser.');
+}
+
+let lastTime;
+let timeout;
+
+//This function is to check user activity
+function check() {
+    const now = Date.now();
+    if (now - lastTime >= 5000000000000) { 
+        window.location.href = "/login/";
+    } else {
+        reset();
+    }
+}
+
+
+ 
+document.addEventListener('DOMContentLoaded', function () {
+    // Change Terminal Font Color
+    document.getElementById('font-color-picker').addEventListener('input', function () {
+        const colorValue = this.value; // Capture the value to use inside forEach
+        document.querySelectorAll('.terminal-text').forEach(element => {
+            element.style.color = colorValue;
+        });
+    });
+
+    // Change Background Color
+    document.getElementById('background-color-picker').addEventListener('input', function () {
+        document.body.style.backgroundColor = this.value;
+    });
+
+    // Change Terminal Background Color
+    document.getElementById('terminal-background-color-picker').addEventListener('input', function () {
+        const terminalContainer = document.querySelector('.terminal-container');
+        terminalContainer.style.backgroundColor = this.value;
+    });
+
+    // Change Font Family
+    document.getElementById('font-family-picker').addEventListener('change', function () {
+        const fontFamilyValue = this.value; // Correctly capturing the value
+        document.querySelectorAll('.terminal-text').forEach(element => {
+            element.style.fontFamily = fontFamilyValue;
+        });
+    });
+});
+
+
+// Start of Battle System
+ // Function defines how much enemy damage is,
+ // Also switches the amount based on what difficulty the user is on
+
+ 
+
+function enemyStrength(difficulty) {
+    let dmg;
+    switch (difficulty) {
+        case "1": 
+            dmg = 5;
+            break;
+        case "2": 
+            dmg = 7;
+            break;
+        case "3": 
+            dmg = 10;
+            break;
+        default:
+            dmg = 5; 
+            break;
+    }
+    const randomProb = Math.random();
+    const damage = Math.floor(dmg * randomProb);
+    return damage;
+}
+// Calculates the probablility that the enemy's attacks hits
+function enemyAttack(difficulty) {
+    let probHit;
+    switch (difficulty) {
+        //If difficulty is easy
+        case "1": 
+            probHit = 0.5;
+            break;
+        //If difficulty is medium
+        case "2":
+            probHit = 0.6;
+            break;
+        //If difficulty is hard
+        case "3":
+            probHit = 0.7;
+            break;
+        //If difficulty is default
+        default:
+            probHit = 0.6; 
+            break;
+    }
+
+    //Enemy's attack lands
+    const randomHit = Math.random();
+    if (randomHit < probHit) {
+        const damage = enemyStrength(difficulty);
+        return {
+            hit: true,
+            damage: damage
+        };
+    } 
+    //Enemy's attack doesn't land
+    else {
+        return {
+            hit: false,
+            damage: 0
+        };
+    }
+}
+// calculates how much user damage can do, based on user type
+function userStrength(type) {
+    switch (type) {
+        //If user is knight
+        case "1": 
+            return 10;
+        //If user is thief
+        case "2": 
+            return 8;
+        //If user is kberserker
+        case "3": 
+            return 12;
+        //If user is magician
+        case "4": 
+            return 7;
+        //If user is default
+        default:
+            return 10; 
+    }
+}
+// Calculates the chance of the user evading enemy attacks, based on user type
+function userEvadeChance(type) {
+    switch (type) {
+        //If user is knight
+        case "1": 
+            return 0.3;
+        //If user is thief
+        case "2": 
+            return 0.5;
+        //If user is berserker
+        case "3": 
+            return 0.2;
+        //If user is magician
+        case "4": 
+            return 0.3;
+        //If user is default
+        default:
+            return 0.3;
+    }
+}
+//main battle function
+async function battle(userHP, enemyHP, difficulty, userType,  callback) {
+    await animNarrate(" ", "{% static 'main/images/battleStart.gif' %}", 400, 400);
+    console.log("battle function called!");
+    let userMP = 10; 
+
+    let userStr = userStrength(userType); 
+    let userEvadeChanceVal = userEvadeChance(userType); 
+
+    switch (userType) {
+        //If user is knight
+        case "1": 
+            break; 
+        //If user is thief
+        case "2": 
+            userHP -= 10; 
+            userEvadeChanceVal = 0.7; 
+            break;
+        //If user is berserker
+        case "3": 
+            userHP += 20; 
+            userStr += 5; 
+            userEvadeChanceVal = 0.3;
+            break;
+        //If user is magician
+        case "4": 
+            userHP -= 10;
+            userMP += 10; 
+            break;
+        //If user is default
+        default:
+            console.log("Invalid user type");
+            break;
+    }
+    
+
+//Battle prompt that pops up everytime an action is required
+    while (userHP > 0 && enemyHP > 0) {
+    const attackChoice = await promptChoice("What do you want to do?", [
+        { label: "Attack", value: "z" },
+        { label: "Defend", value: "x" },
+        { label: "Stay still", value: "c" },
+        { label: "Spell", value: "v" } ,
+        { label: "Run", value: "n" },
+        { label: "Persuade", value: "p" },
+
+    ]);
+
+
+//attack
+        if (attackChoice === "z") {
+            const statEnemy = enemyAttack(difficulty);
+            enemyHP -= userStr;
+            if (enemyHP < 0) {
+                enemyHP = 0;
+            }
+            userHP -= statEnemy.damage;
+            if (userHP < 0) {
+                userHP = 0;
+            }
+        //Attack connects
+            if (userStr > 0) {
+                await animNarrate(" ", "{% static 'main/images/attack.gif' %}", 400, 400);
+                await playSound("{% static 'main/sounds/sword-swing.wav' %}")
+                await narrate("Your attack connects, and does " + userStr + " hit points to the enemy! Enemy Health is: " + enemyHP + " points.");
+            } 
+        //Attack misses
+            else {
+                await playSound("{% static 'main/sounds/miss.mp3' %}")
+                await narrate("Your attack didn't connect to the enemy! Enemy Health is: " + enemyHP + " points.");
+            }
+            
+        //Enemy's attack hits
+            if (statEnemy.hit) {
+                await narrate("The enemy attack hits you, and does " + statEnemy.damage + " hit points to you! Your HP is: " + userHP + " points.");
+            } 
+        //Enemy's attack misses
+            else {
+                
+                await narrate("Enemy's attack misses! Your HP is: " + userHP + " points.");
+            }
+//defend
+        } else if (attackChoice === "x") {
+            const statEnemy = enemyAttack(difficulty);
+            const defendSuccess = Math.random() < userEvadeChanceVal;
+
+        //If user defends successfully
+            if (defendSuccess) {
+                await animNarrate(" ", "{% static 'main/images/defend.gif' %}", 400, 400);
+                await playSound("{% static 'main/sounds/swish.wav' %}")
+                await narrate("You evaded the enemy's attack! Your HP is: " + userHP + " points.");
+            } 
+        //If user defends half
+            else {
+                userHP -= Math.floor(statEnemy.damage * 0.5);
+                await animNarrate(" ", "{% static 'main/images/defend.gif' %}", 400, 400);
+                await playSound("{% static 'main/sounds/defend.wav' %}")
+                await narrate("You defended half of the enemy's attack! Your HP is: " + userHP + " points.");
+            }
+
+            if (userHP < 0) {
+                userHP = 0;
+            }
+
+        //Defense is unsuccessful
+            if (statEnemy.hit) {
+                await narrate("The enemy attack hits you, and does " + statEnemy.damage + " hit points to you! Your HP is: " + userHP + " points.");
+            } else {
+                await narrate("Enemy's attack misses! Your HP is: " + userHP + " points.");
+            }
+//stay still
+        } else if (attackChoice === "c") {
+        //If user is magician, MP increases
+            if (userType === "4")
+            {
+                    userMP += 5;
+                    if (userMP > 20)
+                    {
+                        userMP = 20; 
+                    }
+            }
+        //If user is knight, thief, berserker, MP is 10
+            else 
+            {
+                userMP += 5;
+                if (userMP > 10) 
+                {
+                userMP = 10;
+                }
+            }
+            await animNarrate(" ", "{% static 'main/images/stayStill.gif' %}", 400, 400);
+            await playSound("{% static 'main/sounds/swish.wav' %}")
+            await narrate("You chose not to attack or defend. The enemy makes a move.");
+            await narrate("Your MP is: " + userMP);
+            const statEnemy = enemyAttack(difficulty);
+            userHP -= statEnemy.damage;
+            if (userHP < 0) {
+                userHP = 0;
+            }
+            if (statEnemy.hit) {
+                await narrate("The enemy attack hits you, and does " + statEnemy.damage + " hit points to you! Your HP is: " + userHP + " points.");
+            } else {
+                await narrate("Enemy's attack misses! Your HP is: " + userHP + " points.");
+            }
+        } 
+//persuade
+        if (attackChoice === "p") { 
+    const persuasionMethod = await promptChoice("How will you persuade?", [
+        { label: "Let's Not Fight", value: "peace" },
+        { label: "Show Empathy", value: "empathy" },
+        { label: "Negotiate", value: "negotiation" }
+    ]);
+        await animNarrate(" ", "{% static 'main/images/talk.gif' %}", 400, 400);
+
+    switch (persuasionMethod) {
+        case "peace":
+         
+            await handleLetsNotFight();
+            break;
+        case "empathy":
+           
+            await handleShowEmpathy();
+            break;
+        case "negotiation":
+           
+            await handleNegotiation();
+            break;
+    }
+}
+
+async function handleLetsNotFight() {
+    const successChance = Math.random();
+    if (successChance < 0.3) { 
+        await narrate("The enemy is persuaded and they decide to walk away.");
+        enemyHP = 0; 
+
+    } else {
+        await narrate("The enemy insists on fighting. Get ready!");
+    }
+}
+
+async function handleShowEmpathy() {
+    const successChance = Math.random();
+    if (successChance < 0.5) {
+        await narrate("The enemy is touched by your empathy, so they decide to walk away peacefully.");
+        enemyHP = 0; 
+
+    } else {
+        await narrate("The enemy's mind wasn't changed. They decide to continue the battle. Get ready!");
+
+    }
+}
+
+
+async function handleNegotiation() {
+    const successChance = Math.random();
+    if (successChance < 0.6) {
+        await narrate("You both come to an agreement to avoid conflict.");
+        enemyHP = 0; 
+
+    } else {
+        await narrate("That didn't work. The battle continues. Get ready!");
+       
+    }
+}
+//spell
+         if (attackChoice === "v") {
+            if (userMP >= 5) {
+                const spellDamage = userStr * 2;
+                enemyHP -= spellDamage;
+                userMP -= 5;
+                await animNarrate(" ", "{% static 'main/images/spell.gif' %}", 400, 400);
+                await playSound("{% static 'main/sounds/spell.wav' %}") 
+                await narrate("You cast a spell, dealing " + spellDamage + " damage to the enemy! Enemy Health is: " + enemyHP + " points.");
+                await narrate("Your MP is: " + userMP);
+
+                const statEnemy = enemyAttack(difficulty);
+                userHP -= statEnemy.damage;
+                if (userHP < 0) {
+                    userHP = 0;
+                }
+                if (statEnemy.hit) {
+                    await narrate("The enemy attack hits you, and does " + statEnemy.damage + " hit points to you! Your HP is: " + userHP + " points.");
+                } else {
+                    await narrate("Enemy's attack misses! Your HP is: " + userHP + " points.");
+                }
+            } else {
+                await narrate("You don't have enough MP to cast a spell! Your MP is: " + userMP);
+            }
+        }
+//user's health reaches 0
+        if (userHP <= 0) {
+            showGameOverModal();
+            await narrate("Your health reached 0, you're dead. GAME OVER");
+    
+
+            const statusRestart = await promptChoice("Do you want to restart, or exit the game?",
+                [
+                    { label: "Restart", value: "z" },
+                    { label: "Exit", value: "x" }
+                ]);
+
+            if (statusRestart === "z") 
+            {
+                await begin1(userHP, enemyHP, difficulty, userType);
+            } 
+            else if (statusRestart === "x") 
+            {
+                exit();
+            } 
+            else 
+            {
+                await narrate("Not a valid option, please try again!.");
+            }
+        }
+            if (attackChoice === "n") {
+                await animNarrate(" ", "{% static 'main/images/run.gif' %}", 400, 400);
+                await playSound("{% static 'main/sounds/running.wav' %}")    
+                await narrate("Run as fast as you can!!! Good thing they didn't catch you.");
+                await begin1(userHP, enemyHP, difficulty, userType); 
+                return; 
+            }
+
+        if (enemyHP <= 0) {
+            await narrate("Success, you won the battle!");
+            if (callback) 
+            {
+                //calls function that is the continuation of story after battle is won
+                await callback(userHP, enemyHP, difficulty, userType);
+            }
+            break;
+        }
+
+        await new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 1000);
+        });
+    }
+}
+
+//prompt for user to select which boss to fight
+const commands = ["z", "x", "c", "v", "b"];
+async function begin1(userHP, difficulty, userType) {
+    let availableBosses = [
+        { label: "Ice Queen Cartilana", value: "z" },
+        { label: "Swag King Cash Barti", value: "x" },
+        { label: "Fire King Nayvadius", value: "c" },
+        { label: "Lightning Queen Kajal", value: "v" },
+        { label: "Darkness King Alvin", value: "b" }
+    ];
+
+    while (availableBosses.length > 0) {
+        await narrate("Whom do you choose?");
+        await narrate("--------------------------------------------------------------");
+        
+        const choiceUser = await promptChoice("Options:", availableBosses);
+
+        let updatedEnemyHP = userHP;
+        let chosenBossIndex = availableBosses.findIndex(boss => boss.value === choiceUser);
+
+        if (chosenBossIndex !== -1) {
+            const chosenBoss = availableBosses[chosenBossIndex];
+
+            if (chosenBoss.value === "z") {
+                updatedEnemyHP = await iceSoldier(userHP, updatedEnemyHP, difficulty, userType);
+            } else if (chosenBoss.value === "x") {
+                updatedEnemyHP = await swagSoldier(userHP, updatedEnemyHP, difficulty, userType);
+            } else if (chosenBoss.value === "c") {
+                updatedEnemyHP = await fireSoldier(userHP, updatedEnemyHP, difficulty, userType);
+            } else if (chosenBoss.value === "v") {
+                updatedEnemyHP = await lightSoldier(userHP, updatedEnemyHP, difficulty, userType);
+            } else if (chosenBoss.value === "b") {
+                updatedEnemyHP = await darkSoldier(userHP, updatedEnemyHP, difficulty, userType);
+            }
+
+            if (updatedEnemyHP <= 0) {
+                await narrate("You defeated the boss!");
+                availableBosses.splice(chosenBossIndex, 1);
+            }
+        }
+    }
+    await narrate("Congratulations! You have defeated all bosses!");
+}
+
+
+
+//icesoldier fight
+async function iceSoldier(userHP, enemyHP, difficulty, userType) {
+    console.log("iceSoldier function called!");
+    await narrate("Ice Soldier: In order to fight my glorious Queen you must fight me first!");
+    await narrate("Ice Soldier attacks you!");
+    enemyHP = (gameMode === "3") ? 50 : 25;
+    await battle(userHP, enemyHP, difficulty, userType, begin2);
+}
+//after icesoldier is defeated
+async function begin2(userHP, enemyHP, difficulty, userType) {
+    console.log("begin2 function called!");
+        await narrate("Continue?");
+        await narrate("--------------------------------------------------------------");
+        await narrate("Options: z = Continue / x = Exit");
+
+        const choiceUser = await promptChoice("--------------------------------------------------------------", [
+            { label: "Continue", value: "z" },
+            { label: "Exit", value: "x" }
+        ]);
+
+        if (choiceUser === "z") 
+        {
+            await iceQueen(userHP, enemyHP, difficulty, userType);
+        }
+    
+    else 
+    {
+        await exit();
+    }
+}
+//icequeen fight
+async function iceQueen(userHP, enemyHP, difficulty, userType) {
+    await animNarrate(" ", "{% static 'main/images/iceQueen.png' %}", 400, 400);
+    await narrate("CARTILANA: I see you have entered my domain after killing my soldiers. Consider this the last time you breathe. Any last words?");
+    await narrate("--------------------------------------------------------------");
+    await narrate("Options: z = Ay what's up shawty you kinda cute ngl/ x = Nah I'd Win/ c = My heat will melt through your ice cold heart!");
+
+    const choiceUser = await promptChoice("--------------------------------------------------------------", [
+        { label: "Ay what's up shawty", value: "z" },
+        { label: "Nah I'd Win", value: "x" },
+        { label: "Your ice cold heart", value: "c" }
+    ]);
+
+    if (choiceUser === "z") {
+        enemyHP = 100;
+        enemyHP += 10;
+        await narrate("CARTILANA: YOU FOOL! You try to rizz me up before you die? I'll show you my full power now!");
+        await narrate("Cartilana gets stronger, hearing your pathetic attempts at rizz.");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    } else if (choiceUser === "x") {
+        enemyHP = 100;
+        enemyHP -= 10;
+        await narrate("CARTILANA: What strong words! Oh I am afraid(SHOCKED EMOJI)!!!! I might be less stronger than you!!");
+        await narrate("Cartilana gets weaker, though you find yourself questioning why she's talking with emojis.");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    } else if (choiceUser === "c") {
+        enemyHP = 100; 
+        userHP += 5;
+        await narrate("CARTILANA: I felt you become stronger. Well perhaps I underestimated your strength.");
+        await narrate("You become stronger now!");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    }
+}
+//swag soldier fight
+async function swagSoldier(userHP, enemyHP, difficulty, userType) {
+    console.log("swagSoldier function called!");
+    await narrate("Swag Soldier: In order to fight my glorious King you must fight me first!");
+    await narrate("Swag Soldier attacks you!");
+    enemyHP = (gameMode === "3") ? 50 : 25;
+    await battle(userHP, enemyHP, difficulty, userType, begin3);
+}
+//after swag soldier fight
+async function begin3(userHP, enemyHP, difficulty, userType) {
+    console.log("begin3 function called!");
+        await narrate("Continue?");
+        await narrate("--------------------------------------------------------------");
+        await narrate("Options: z = Continue / x = Exit");
+
+        const choiceUser = await promptChoice("--------------------------------------------------------------", [
+            { label: "Continue", value: "z" },
+            { label: "Exit", value: "x" }
+        ]);
+
+        if (choiceUser === "z") 
+        {
+            await swagKing(userHP, enemyHP, difficulty, userType);
+        }
+    
+    else 
+    {
+        await exit();
+    }
+}
+//swag king fight
+async function swagKing(userHP, enemyHP, difficulty, userType) {
+    await animNarrate(" ", "{% static 'main/images/swagKing.png' %}", 500, 500);
+    await narrate("CASH BARTI: ++wHaT's uP ! slaTT. . y0u g0TTA > tAK3 me on firST beF0r3 y0U . tAKe on l3b0Z0. sHaM3 cUZ > y0U'r3 . swaGGY and we c0ULD'v3 bE3n fRieNds. hAv3 aT > y0U pI30n!++");
+    await narrate("--------------------------------------------------------------");
+    await narrate("Options: z = I will send you to the sky!/ x = You chose the wrong location for this!/ c = I will make sure it is a long time before you come back!");
+
+    const choiceUser = await promptChoice("--------------------------------------------------------------", [
+        { label: "Send To Sky!", value: "z" },
+        { label: "Wrong Location", value: "x" },
+        { label: "Long Time", value: "c" }
+    ]);
+
+    if (choiceUser === "z") {
+        enemyHP = 100;
+        enemyHP += 10;
+        await narrate("CASH BARTI: y0u'Re > n0T tHat gUy . pal");
+        await narrate("Cash Barti get's stronger thinking you are showing empty threats");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    } else if (choiceUser === "x") {
+        enemyHP = 100;
+        enemyHP -= 10;
+        await narrate("CASH BARTI: ++95% sWag, > l0ST 5% by tAlKING t0 . y0u++");
+        await narrate("Cash Barti gets weaker!");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    } else if (choiceUser === "c") {
+        enemyHP = 100;
+        userHP += 5;
+        await narrate("CASH BARTI: my fATh3R wAS a gaM3r. !");
+        await narrate("You become stronger now!");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    }
+}
+//fire soldier fight
+async function fireSoldier(userHP, enemyHP, difficulty, userType) {
+    console.log("fireSoldier function called!");
+    await narrate("Fire Soldier: In order to fight my glorious King you must fight me first!");
+    await narrate("Fire Soldier attacks you!");
+    enemyHP = (gameMode === "3") ? 50 : 25;
+    await battle(userHP, enemyHP, difficulty, userType, begin4);
+}
+//after fire soldier fight
+async function begin4(userHP, enemyHP, difficulty, userType) {
+    console.log("begin4 function called!");
+        await narrate("Continue?");
+        await narrate("--------------------------------------------------------------");
+        await narrate("Options: z = Continue / x = Exit");
+
+        const choiceUser = await promptChoice("--------------------------------------------------------------", [
+            { label: "Continue", value: "z" },
+            { label: "Exit", value: "x" }
+        ]);
+
+        if (choiceUser === "z") 
+        {
+            await fireKing(userHP, enemyHP, difficulty, userType);
+        }
+    
+    else 
+    {
+        await exit();
+    }
+}
+//fire king fight
+async function fireKing(userHP, enemyHP, difficulty, userType) {
+    await animNarrate(" ", "{% static 'main/images/fireKing.png' %}", 500, 500);
+    await narrate("NAYVADIUS: What a time to be alive");
+    await narrate("--------------------------------------------------------------");
+    await narrate("Options: z = You cant see the future!/ x = Imma send you to pluto!/ c = LESGOOOOOOOOO!");
+
+    const choiceUser = await promptChoice("--------------------------------------------------------------", [
+        { label: "You can't see the future!", value: "z" },
+        { label: "Wrong Location", value: "x" },
+        { label: "Long Time", value: "c" }
+    ]);
+
+    if (choiceUser === "z") {
+        enemyHP = 100;
+        enemyHP += 10;
+        await narrate("NAYVADIUS: Foolish");
+        await narrate("Nayvadius get's stronger because he's too cool");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    } else if (choiceUser === "x") {
+        enemyHP = 100;
+        enemyHP -= 10;
+        await narrate("NAYVADIUS: Sensational");
+        await narrate("Nayvadius gets weaker!");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    } else if (choiceUser === "c") {
+        enemyHP = 100;
+        userHP += 5;
+        await narrate("NAYVADIUS: It's an evil world out there!");
+        await narrate("You become stronger now!");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    }
+}
+//light soldier fight
+async function lightSoldier(userHP, enemyHP, difficulty, userType) {
+    console.log("lightSoldier function called!");
+    await narrate("Light Soldier: In order to fight my glorious Queen you must fight me first!");
+    await narrate("Light Soldier attacks you!");
+    enemyHP = (gameMode === "3") ? 50 : 25;
+    await battle(userHP, enemyHP, difficulty, userType, begin5);
+}
+//after light soldier fight
+async function begin5(userHP, enemyHP, difficulty, userType) {
+    console.log("begin5 function called!");
+        await narrate("Continue?");
+        await narrate("--------------------------------------------------------------");
+        await narrate("Options: z = Continue / x = Exit");
+
+        const choiceUser = await promptChoice("--------------------------------------------------------------", [
+            { label: "Continue", value: "z" },
+            { label: "Exit", value: "x" }
+        ]);
+
+        if (choiceUser === "z") 
+        {
+            await lightQueen(userHP, enemyHP, difficulty, userType);
+        }
+    
+    else 
+    {
+        await exit();
+    }
+}
+//light queen fight
+async function lightQueen(userHP, enemyHP, difficulty, userType) {
+    await animNarrate(" ", "{% static 'main/images/lightQueen.png' %}", 500, 500);
+    await narrate("KAJAL: I must strike you down before you get to Lebozo!");
+    await narrate("--------------------------------------------------------------");
+    await narrate("Options: z = NO U/ x = PLS NOOOOO/ c = I strike back!");
+
+    const choiceUser = await promptChoice("--------------------------------------------------------------", [
+        { label: "NO U!", value: "z" },
+        { label: "PLS NOOOOOO", value: "x" },
+        { label: "I strike back!", value: "c" }
+    ]);
+
+    if (choiceUser === "z") {
+        enemyHP = 100;
+        enemyHP += 10;
+        await narrate("KAJAL: I'm stronger alwasy");
+        await narrate("Kajal gets stronger!");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    } else if (choiceUser === "x") {
+        enemyHP = 100;
+        enemyHP -= 10;
+        await narrate("KAJAL: I will shatter your rails");
+        await narrate("Kajal gets weaker!");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    } else if (choiceUser === "c") {
+        enemyHP = 100;
+        userHP += 5;
+        await narrate("KAJAL: HAVE AT YOU!");
+        await narrate("You become stronger now!");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    }
+}
+//dark soldier fight
+async function darkSoldier(userHP, enemyHP, difficulty, userType) {
+    console.log("darkSoldier function called!");
+    await narrate("Dark Soldier: In order to fight my glorious King you must fight me first!");
+    await narrate("Dark Soldier attacks you!");
+    enemyHP = (gameMode === "3") ? 50 : 25;
+    await battle(userHP, enemyHP, difficulty, userType, begin6);
+}
+//after dark soldier fight
+async function begin6(userHP, enemyHP, difficulty, userType) {
+    console.log("begin6 function called!");
+        await narrate("Continue?");
+        await narrate("--------------------------------------------------------------");
+        await narrate("Options: z = Continue / x = Exit");
+
+        const choiceUser = await promptChoice("--------------------------------------------------------------", [
+            { label: "Continue", value: "z" },
+            { label: "Exit", value: "x" }
+        ]);
+
+        if (choiceUser === "z") 
+        {
+            await darkKing(userHP, enemyHP, difficulty, userType);
+        }
+    
+    else 
+    {
+        await exit();
+    }
+}
+//dark king fight
+async function darkKing(userHP, enemyHP, difficulty, userType) {
+    await animNarrate(" ", "{% static 'main/images/darkKing.png' %}", 500, 500);
+    await narrate("ALVIN: ME AND THE GHOSTS OF MY TWO BROTHERS WILL ATTACK YOU");
+    await narrate("--------------------------------------------------------------");
+    await narrate("Options: z = What a goofy name / x = Why are you the darkness king? / c = Aight bro let's get started already.");
+
+    const choiceUser = await promptChoice("--------------------------------------------------------------", [
+        { label: "GOOFY NAME", value: "z" },
+        { label: "Dark King?", value: "x" },
+        { label: "AIGHT BRO", value: "c" }
+    ]);
+
+    if (choiceUser === "z") {
+        enemyHP = 100;
+        enemyHP += 10;
+        await narrate("ALVIN: You're just like the rest of them. I channel the power of my brothers!");
+        await narrate("Alvin gets stronger thinking about his brothers!");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    } else if (choiceUser === "x") {
+        enemyHP = 100;
+        enemyHP -= 10;
+        await narrate("ALVIN: All the kids used to bully me so I would stay inside. Inside has darkness. Inside me is all darkness. I will show you that humanity is wrong, and it will be my time to rule after Lebozo!!!");
+        await narrate("Alvin gets weaker as he thinks about how he got bullied!");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    } else if (choiceUser === "c") {
+        enemyHP = 100;
+        userHP += 5;
+        await narrate("ALVIN: Meet me outside");
+        await narrate("You become stronger now!");
+        await battle(userHP, enemyHP, difficulty, userType, begin1);
+    }
+}
+
+async function beginPrompt(userHP, enemyHP, difficulty, userType) 
+{
+    await animNarrate(" ", "{% static 'main/images/start.gif' %}");
+    await narrate("Last game, you defeated Legoat, now known as Lefraud the shameful Mouse King. His son Lebozo has come after you now with his 5 minions. Which one do you take on first?");
+    await begin1(userHP, enemyHP, difficulty, userType);
+}
+    
+//tutorial
+async function tutorial(userHP, enemyHP, difficulty, userType) 
+{
+    await narrate("Hello, and welcome to Shattered Rails 2! This is the tutorial to the game.");
+    await narrate("Throughout this game, you will encounter scenarios that will ask you for your input to further the game. All you have to do is enter the corresponding option for the choice, to go down that path. There'll be options presented, alongside with their alphabetical inputs correlating to that decision.");
+    await narrate("Here is an example:");
+    await narrate("You are in a strange space and you see two directions around you, do you want to go left, or right?");
+    await narrate("----------------------------------");
+    await narrate("Options: z = Go left /x = Go right");
+    await narrate("----------------------------------");
+    await narrate("From here on, all you'd need to do is choose which choice to choose and see the results!");
+    await narrate("\nSelecting the difficulty in the beginning of the game will dictate how difficult your experience in the game will be. Selecting difficulty will affect the player's health and the enemy’s health with your health decreasing and the enemy’s health increasing as the difficulty increases. Enemies will also do more damage as the difficulty increases. Easy will provide the simplest gameplay experience while hard will be more difficult in combat scenarios. Both games offer difficulty selection in the beginning of the game.");
+    await narrate("\nSelecting a class to play as is offered in Shattered Rails 2. Each class has its own unique set benefits and drawbacks. The Knight class offers the base stats providing a balanced experience. The Berserker class offers more health points (HP) for the player but has less of a chance to evade attacks. The Thief has a greater chance to evade compared to other classes but has less HP. The Magician offers more Magic Points (MP) to be able to use more spells but has the least amount of health.");
+    await narrate("\nIn Shattered Rails 2, the attack command damage is based on the class you choose and requires no resources. The defend attack has a chance to either block 50% of the incoming damage from the enemy’s next attack or to completely evade the attack taking no damage. The chance of evasion is affected by the class you select in the beginning. The stay still command replenishes 5MP each time it is called but leaves the user vulnerable to enemy attacks. Spell casts a magic attack and uses a certain amount of MP. MP is a limited resource and spells can no longer be used if it is fully depleted. The run command makes the user run away from battle and go back to the boss select screen. Persuade command gives you the chance to use charisma to avoid conflict. However, if the persuasion fails the battle will continue and possibly make the boss stronger.");
+    await narrate("\nThe fights will keep going until your HP, which carries on after every fight, reaches 0, so see how far you get!");
+    await narrate("\nThus concludes the tutorial, would you like to read this again?");
+    await narrate("----------------------------------");
+    await narrate("Options: z = Play Game /x = Reread");
+    await narrate("----------------------------------");    
+    const choiceUser = await promptChoice("Thus concludes the tutorial, would you like to read this again?", [
+        { label: "Play Game", value: "z" },
+        { label: "Reread", value: "x" }
+    ]);
+
+    if (choiceUser === "z") {
+        await beginPrompt(userHP, enemyHP, difficulty, userType);
+    } else if (choiceUser === "x") {
+        await tutorial(userHP, enemyHP, difficulty, userType);
+    }
+}
+//main function
+async function main() {
+    await narrate("--------------------------------------------");
+    await narrate("Hello, welcome to Shattered Rails 2.");
+    await narrate("Please input a name: ");
+
+    const userNameInp = () => {
+        document.getElementById("name-input-container").innerHTML = "<input style='background-color: black; border-radius: 20px; margin: 0 10px; color: white; margin-bottom: 20px' type='text' id='name' placeholder='Enter your name'>";
+    };
+    userNameInp();
+    const userNamePromise = new Promise(resolve => {
+        document.getElementById("name").addEventListener("change", () => {
+            resolve(document.getElementById("name").value.trim());
+        });
+    });
+
+    const nameInput = await userNamePromise;
+    document.getElementById("name-input-container").innerHTML = "";
+
+    name = nameInput || "Akira";
+
+    await narrate(`Your name is: ${name}.`);
+
+    await narrate("Before starting this game, please choose the game mode:");
+
+    await narrate("---------------------------------------------------------------------");
+    await narrate("Options: 1 = Easy / 2 = Medium / 3 = Hard");
+    await narrate("---------------------------------------------------------------------");
+
+    gameMode = await promptChoice("---------------------------------------------------------------------", [
+        { label: "Easy", value: "1" },
+        { label: "Medium", value: "2" },
+        { label: "Hard", value: "3" }
+    ]);
+    
+    let userHP, enemyHP;
+    switch (gameMode) {
+        //If difficulty is easy
+        case "1":
+            userHP = 100;
+            enemyHP = 25;
+            break;
+        //If difficulty is medium
+        case "2":
+            userHP = 50;
+            enemyHP = 25;
+            break;
+        //If difficulty is hard
+        case "3":
+            userHP = 30;
+            enemyHP = 50;
+            break;
+        //If difficulty is defaulted to medium
+        default:
+            console.log("Invalid option selected. Default Medium")
+            userHP = 50;
+            enemyHP = 25;
+            break;
+    }
+
+    await narrate("Please choose character type:");
+
+    await narrate("---------------------------------------------------------------------");
+    await narrate("Options: 1 = Knight / 2 = Thief / 3 = Berserker / 4 = Magician");
+    await narrate("---------------------------------------------------------------------");
+
+    userType = await promptChoice("---------------------------------------------------------------------", [
+        { label: "Knight", value: "1" },
+        { label: "Thief", value: "2" },
+        { label: "Berserker", value: "3" },
+        { label: "Magician", value: "4" }
+    ]);
+//knight
+    if (userType === "1") {
+        await animNarrate(" ", "{% static 'main/images/knight.png' %}", 500, 500);
+        playSound("{% static 'main/sounds/knight.wav' %}")
+    }
+//thief
+    else if (userType === "2") {
+        await animNarrate(" ", "{% static 'main/images/thief.png' %}", 500, 500);
+        playSound("{% static 'main/sounds/thief.wav' %}")
+    }
+//berserker
+    else if (userType === "3") {
+        await animNarrate(" ", "{% static 'main/images/berserk.png' %}", 500, 500);
+        playSound("{% static 'main/sounds/beserker.wav' %}")
+    }
+//magician
+    else if (userType === "4") {
+        await animNarrate(" ", "{% static 'main/images/magic.png' %}", 500, 500);
+        playSound("{% static 'main/sounds/magician.wav' %}")
+    }
+
+    const choiceUser = await promptChoice("Before starting this game, would you want to see the tutorial for Shattered Rails?", [
+        { label: "Play Game", value: "z" },
+        { label: "See Tutorial", value: "x" }
+    ]);
+
+    if (choiceUser === "z") {
+        await beginPrompt(userHP, enemyHP, gameMode, userType);
+    } else if (choiceUser === "x") {
+        await tutorial(userHP, enemyHP, gameMode, userType);
+    } else {
+        await narrate("Not a valid option, please try again!.");
+    }
+}
+
+main();
+        // Function to change line spacing
+document.getElementById("line-spacing-picker").addEventListener("input", function () {
+    const lineSpacingValue = this.value;
+    const terminalText = document.querySelector('.terminal-text');
+    terminalText.style.lineHeight = lineSpacingValue;
+
+
+        // Function to change background color
+        document.getElementById("background-color-picker").addEventListener("input", function () {
+            document.body.style.backgroundColor = this.value;
+        });
+
+        // Function to change font color
+        document.getElementById("font-color-picker").addEventListener("input", function () {
+            document.querySelector('.terminal-text').style.color = this.value;
+        });
+
+        // Function to change terminal background color
+        document.getElementById("terminal-background-color-picker").addEventListener("input", function () {
+            document.querySelector('.terminal-container').style.backgroundColor = this.value;
+        });
+
+        // Function to change font family
+        document.getElementById("font-family-picker").addEventListener("change", function () {
+            const selectedFont = this.value;
+            document.querySelector('.terminal-text').style.fontFamily = selectedFont;
+            document.querySelector('.logout-button').style.fontFamily = selectedFont;
+            document.querySelector('.speed-slider').style.fontFamily = selectedFont;
+            document.querySelector('.help-button').style.fontFamily = selectedFont;
+
+        });
+    });
+     //Function to change background color
+     function changeBackgroundColor(color) {
+        document.body.style.backgroundColor = color;
+    }
+
+    //Function to change font color
+    function changeFontColor(color) {
+        document.body.style.color = color;
+    }
+
+    //Function to change font family
+    function changeFontFamily(font) {
+        document.body.style.fontFamily = font;
+    }
+
+    function changeFontSize(size) {
+    document.body.style.fontSize = size;
+    document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, label, button, input').forEach(element => {
+        element.style.fontSize = size;
+    });
+}
+    function showGameOverModal() {
+        var modal = document.getElementById("gameOverModal");
+        modal.style.display = "block";
+        pauseStatus = true; 
+    }
+
+    function closeGameOverModal() {
+        var modal = document.getElementById("gameOverModal");
+        modal.style.display = "none";
+        pauseStatus = false; 
+    }
+    function restartGame() {
+        closeGameOverModal();
+        main();
+    }
+    window.onclick = function(event) {
+        var gameOverModal = document.getElementById("gameOverModal");
+        if (event.target == gameOverModal) {
+            closeGameOverModal();
+        }
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+        applySavedSettings();
+        document.getElementById('settings-button').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('settings-popup').classList.toggle('open');
+        });
+        document.getElementById('close-popup').addEventListener('click', function() {
+            document.getElementById('settings-popup').classList.remove('open');
+        });
+        var resetButton = document.getElementById('reset-button');
+        resetButton.addEventListener('click', function() {
+            window.location.reload();
+        });
+        document.getElementById('save-button').addEventListener('click', saveSettings);
+    });
+        
+        function applySavedSettings() {
+            const savedBgColor = localStorage.getItem('background-color-picker');
+            const savedFontFamily = localStorage.getItem('font-family-picker');
+            const savedFontSize = localStorage.getItem('font-size');
+            const savedTextSpeed = localStorage.getItem('text-speed-selector');
+            const savedFontColor = localStorage.getItem('font-color-picker');
+            const savedTerminalBgColor = localStorage.getItem('shatteredRailsTerminalBgColor');
+    
+        
+            if (savedBgColor) {
+                changeBackgroundColor(savedBgColor);
+            }
+            if (savedFontFamily) {
+                changeFontFamily(savedFontFamily);
+            }
+            if (savedFontSize) {
+                changeFontSize(savedFontSize);
+            }
+            if (savedTextSpeed) {
+                changeTextSpeed(savedTextSpeed);
+            }
+            if (savedFontColor) {
+                changeFontColor(savedFontColor);
+            }
+            if (savedTerminalBgColor) {
+                changeTerminalBgColor(savedTerminalBgColor);
+            }
+        }
+        document.getElementById('reset-button').addEventListener('click', function() {
+            localStorage.removeItem('background-color-picker');
+            localStorage.removeItem('font-family-picker');
+            localStorage.removeItem('font-size');
+            localStorage.removeItem('font-color-picker');
+            localStorage.removeItem('shatteredRailsTerminalBgColor');
+            resetUI();
+        });
+    
+        
+        function saveSettings() {
+            const bgColor = document.getElementById('background-color-picker').value;
+            const fontFamily = document.getElementById('font-family-picker').value;
+            const fontSize = document.getElementById('font-size').value;
+            const textSpeed = document.getElementById('text-speed-selector').value;
+            const fontColor = document.getElementById('font-color-picker').value;
+            const terminalBgColor = document.getElementById('shatteredRailsTerminalBgColor').value;
+        
+            localStorage.setItem('background-color-picker', bgColor);
+            localStorage.setItem('font-family-picker', fontFamily);
+            localStorage.setItem('font-size', fontSize);
+            localStorage.setItem('text-speed-selector', textSpeed);
+            localStorage.setItem('font-color-picker', fontColor);
+            localStorage.setItem('shatteredRailsTerminalBgColor', terminalBgColor);
+        
+            const confirmationMessage = document.getElementById('save-confirmation');
+            confirmationMessage.textContent = "Settings saved!";
+            confirmationMessage.style.display = "block";
+
+            setTimeout(() => {
+                confirmationMessage.style.display = "none";
+            }, 3000);
+        
+        }
+    //Function to change background color
+    function changeBackgroundColor(color) {
+        document.body.style.backgroundColor = color;
+    }
+    
+    //Function to change font color
+    function changeFontColor(color_2) {
+        document.body.style.color = color_2;
+    }
+    
+    //Function to change font family
+    function changeFontFamily(font) {
+        document.body.style.fontFamily = font;
+    }
+    
+    function changeFontSize(size) {
+    document.body.style.fontSize = size;
+    document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, label, button, input').forEach(element => {
+        element.style.fontSize = size;
+    });
+    }
+    function toggleSettingsPopup() {
+        var popup = document.getElementById("settings-popup");
+        if (popup.style.right === "0px") {
+            popup.style.right = "-400px";
+        } else {
+            popup.style.right = "0px";
+        }
+    }
+    
+    document.getElementById('settings-button').addEventListener('click', toggleSettingsPopup);
+    document.getElementById('close-popup').addEventListener('click', toggleSettingsPopup);
+    
+    function resetUI() {
+        const defaultBgColor = 'monospace'; 
+        const defaultFontFamily = 'Arial, sans-serif'; 
+        const defaultFontSize = '16px';
+        const defaultTextSpeed = '0.5x'; 
+        const defaultFontColor = 'white'; 
+        const defaultTerminalBgColor = '#121212'; 
+    
+        changeBackgroundColor(defaultBgColor);
+        document.getElementById('background-color-picker').value = defaultBgColor;
+    
+        changeFontFamily(defaultFontFamily);
+        document.getElementById('font-family-picker').value = defaultFontFamily;
+    
+        changeFontSize(defaultFontSize);
+        document.getElementById('font-size').value = defaultFontSize;
+    
+        changeFontColor(defaultFontColor);
+        document.getElementById('font-color-picker').value = defaultFontColor;
+        
+        changeTerminalBgColor(defaultTerminalBgColor);
+        document.getElementById('shatteredRailsTerminalBgColor').value = defaultTerminalBgColor;
+        document.getElementById('save-confirmation').style.display = "none";
+    }
+    function toggleMenu() {
+        var menuItems = document.getElementById("menu-items");
+        menuItems.classList.toggle("active");
+    }
+    </script>
+                
+    {% endif %}
+    <div id="gameOverModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeGameOverModal()">&times;</span>
+            <p>Game Over! You have been defeated.</p>
+            <p>Please Try Again!! if you have the courage for it...</p>
+        </div>
+    </div>
+</body>
+
+</html>

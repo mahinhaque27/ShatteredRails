@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--This is for the title of the page-->
+<title>Welcome to Shattered Rails</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    /*These are the css styles for the page */
+    /* These are the CSS animation for pulse effect */
+@keyframes pulseBackground {
+  0%, 100% {
+    box-shadow: 0 0 10px #89cff0, 0 0 20px #89cff0, 0 0 30px #89cff0; 
+    border-color: #89cff0; 
+  }
+  50% {
+    box-shadow: 0 0 20px #549dd7, 0 0 40px #549dd7, 0 0 60px #549dd7; 
+    border-color: #549dd7; 
+  }
+}
+/* These are the general styles of the page */
+html, body {
+    height: 100%; 
+    min-height: 100%; 
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+    background-color: black;
+    color: #89cff0; 
+    overflow-x: hidden; 
+    
+}
+/* Container for the theme */
+.cyber-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; 
+    
+}
+/* Text styling for the theme */
+.cyber-text {
+    font-size: 52px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #89cff0; 
+    
+}
+/*Here is for the styling for game card */
+.game-card {
+    background-color: #121212;
+    padding: 20px;
+    margin-top: 20px;
+    border: 2px solid #89cff0;
+    animation: pulseBackground 2s infinite;
+}
+/* This is for the title styling for look */
+.game-title {
+    color: #89cff0; 
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+/* This is for the description styling for look */
+.game-description {
+    color: #89cff0; 
+    margin-bottom: 20px;
+}
+/* This is for the styling for start button */
+.start-button {
+    padding: 10px 20px;
+    font-size: 20px;
+    background-color: #549dd7;  /* Here is for the background color */
+    color: #fff; /* Here is for the text color */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s; 
+}
+/* This is for the hover effect for start button */
+.start-button:hover {
+    background-color: #407ba7; /* This is for the background color on hover */
+}
+
+</style>
+</head>
+<body>
+    <div class="cyber-container">
+        <!-- Here is the description for game card -->
+        <!-- This is for the heading for welcome message -->
+        <h1 class="cyber-text">Welcome to Shattered Rails 2: The Requiem of Shattering<br>Are you ready to begin?</h1>
+        <div class="game-card">
+             <!-- Here is for the title for game card -->
+            <h2 class="game-title">Mission Briefing</h2>
+            <p class="game-description">After the events of the first Shattered Rails, new monsters await to take their revenge</p>
+            <!-- This is the button to start the game -->
+            <button class="start-button" onclick="startGame()">Start Mission</button>
+        </div>
+    </div>
+
+    
+    <script>
+        //This is the function to start the game
+        function startGame() {
+            // Redirect to /game after the button is clicked
+            window.location.href = "{% url 'game_2' %}";
+        }
+    </script>
+</body>
+</html>
+

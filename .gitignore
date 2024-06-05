@@ -1,0 +1,12 @@
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore VS Code files
+.vscode/*
+
+# Ignore certain folders
+TextAdventure/TextAdventure/__pycache__/
+TextAdventure/main/__pycache__/

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Forgot Username</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<!-- These are all of the CSS styles for the page -->
+    <style>
+        /* This is the styling for the reset button */
+        .reset-button {
+            margin-top: 20px;
+            padding: 15px 20px;
+            color: white;
+            background-color: black; 
+            border: 1px solid #ccc; 
+            border-radius: 4px;
+            cursor: pointer;
+            display: block; 
+            font-size: 24px;
+        }
+         /* These are the styles for the settings popup */
+            
+        .settings-popup {
+            position: fixed;
+            top: 0;
+            right: -400px; 
+            width: 300px;
+            height: 100%;
+            background-color: black; 
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            transition: right 0.5s;
+            z-index: 1000;
+            padding: 20px; 
+            font-size: 18px; 
+            overflow-y: auto;
+            color: #ecf0f1; 
+        }
+        /* These are the styles for the open settings popup */
+        .settings-popup.open {
+            right: 0;
+        }
+        /* These are the styles for the settings popup title */
+        .settings-popup h2 {
+            color: #ecf0f1;
+            font-size: 24px; 
+            margin-bottom: 20px; 
+            text-align: center; 
+        }
+        /*These are the styles for labels in the settings popup */
+        .settings-popup label {
+            display: block;
+            margin-bottom: 10px;
+            color: #ecf0f1; 
+        }
+         /*Below are the styles for input fields and selects in the settings popup */
+        .settings-popup input[type="color"],
+        .settings-popup select {
+            display: block;
+            width: 100%; 
+            margin-bottom: 20px; 
+            border: 1px solid #34495e;
+            background-color: #34495e;
+            color: #ecf0f1; 
+            padding: 10px; 
+            border-radius: 4px; 
+        }
+         /*Below are the styles for buttons in the settings popup */
+        .settings-popup .button {
+            background-color: #16a085; 
+            color: white; 
+            text-transform: uppercase; 
+            font-weight: bold; 
+            border: none; 
+            border-radius: 4px; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            margin-bottom: 20px; 
+            width: 100%; 
+            box-sizing: border-box; 
+            transition: background-color 0.3s ease; 
+        }
+         /* Below are the hover effect for buttons in the settings popup */
+        .settings-popup .button:hover {
+            background-color: #1abc9c; 
+        }
+        
+        .settings-popup .close-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #c0392b; 
+            cursor: pointer;
+            font-size: 24px;
+        }
+        /* Below are the styles for the close button in the settings popup */
+        .close-button {
+            color: black;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+/*Below is the hover effect for the close button */
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+          /* Below is the styles for the menu bar */
+        .menu-bar {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px;
+            list-style: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 20px;
+            z-index: 1000;
+        }
+         /* Below are the styles for links in the menu bar */
+        .menu-bar a {
+            color: white;
+            padding: 20px 40px;
+            text-decoration: none;
+            margin: 0 10px;
+            border: 2px solid white;
+            border-radius: 40px;
+            transition: background-color 0.3s;
+            font-size: 28px;
+        }
+            /* Below is the hover effect for links in the menu bar */
+        .menu-bar a:hover {
+            background-color: #007bff;
+        }
+        /* Below is the general styles for the body */
+        body {
+            background-color: rgb(15, 19, 27);;
+            color: #FFF;
+            font-family: monospace;
+            font-size: 30px; 
+        }
+/* Below are the styles for headings */
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+        }
+  /* Below are the styles for forms */
+        form {
+            max-width: 600px; 
+            margin: 20px auto; 
+            padding: 20px; 
+        }
+  /* Below are the styles for labels, inputs, and buttons */
+        label, input, button {
+            display: block;
+            width: 100%;
+            margin-bottom: 20px; 
+            font-size: 1.5em;
+        }
+ /* These are the styles for email inputs and buttons */
+        input[type="email"], button {
+            padding: 15px; 
+            border: 2px solid #ccc;
+            border-radius: 10px; 
+        }
+    /* These are the styles for email inputs */
+        input[type="email"] {
+            background-color: #fff;
+            color: #000;
+        }
+    /* These are the styles for buttons */
+        button {
+            background-color: #444;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+        }
+   /* This is the hover effect for buttons */
+        button:hover {
+            background-color: #555;
+        }
+
+    /*Below is the styles for messages */
+        #message {
+            text-align: center; 
+            font-weight: bold; 
+        }
+    /*Below are the styles for error messages */
+        .error {
+            color: #F00;
+        }
+    /*Below are the styles for success messages */
+        .success {
+            color: #0F0;
+        }
+    </style>
+<body>
+        <!-- This is the title for forgot username page -->
+    <h1>Forgot Username</h1>
+     <!--Below is the form for submitting email to retrieve username -->
+    <form id="forgot-username-form" method="post">
+        {% csrf_token %}
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" required> 
+        <button type="submit">Submit</button>
+    </form>
+        <!-- Below is to display message -->
+    <div id="message"></div>
+
+
+    <script>
+    $(document).ready(function() {
+        $('#forgot-username-form').on('submit', function(e) {
+            e.preventDefault();  
+             
+               //This is the function to check if form is valid
+            if (this.checkValidity()) {
+
+                var formData = $(this).serialize();
+                
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: $(this).attr('method'),
+                    data: formData,
+                    dataType: 'json',
+                    success: function(response) {
+                            //This is for the success message
+                        if (response.success) {
+
+                            $('#message').text(response.message).removeClass('error').addClass('success');
+                        } else {
+      
+                            $('#message').text(response.message).removeClass('success').addClass('error');
+                        }
+                    },
+                     //This is for the error message
+                    error: function(xhr, status, error) {
+                         //This will display error message if form is invalid
+                        console.error('AJAX request failed:', error);
+                    }
+                });
+            } else {
+        
+                $('#message').text('Please enter your email.').removeClass('success').addClass('error');
+            }
+        });
+    });
+    </script>
+<body style="margin-top: 150px;">
+<!--This is for the menu bar-->
+<div class="menu-bar">
+    <a href="{% url 'index' %}">Home</a>
+    <a href="{% url 'login' %}">Login</a>
+    <a href="{% url 'register' %}">Register</a>
+    <a href="#" id="settings-button" class="menu-item">Settings</a>
+</div>
+  <!-- Here is the settings popup -->
+<div id="settings-popup" class="settings-popup">
+    <button id="close-popup" class="close-popup">&times;</button>
+    <h2>Settings</h2>
+      <!-- This is for the background color setting -->
+    <div class="setting">
+        <label for="bg-color">Background Color:</label>
+        <input type="color" id="bg-color" onchange="changeBackgroundColor(this.value)" value="#222">
+    </div>
+        <!-- Here is the font family setting -->
+    <div class="setting">
+        <label for="font-family">Font Family:</label>
+        <select id="font-family" onchange="changeFontFamily(this.value)">
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="Times New Roman, serif">Times New Roman</option>
+            <option value="Courier New, monospace">Courier New</option>
+        </select>
+    </div>
+     <!-- Here is the font size setting -->
+    <div class="setting">
+        <label for="font-size">Font Size:</label>
+        <select id="font-size" onchange="changeFontSize(this.value)">
+            <option value="12px">12px</option>
+            <option value="14px">14px</option>
+            <option value="16px">16px</option>
+            <option value="18px">18px</option>
+            <option value="19px">19px</option>
+            <option value="20px">20px</option>
+            <option value="21px">21px</option>
+            <option value="22px">22px</option>
+        </select>
+    </div>
+    <div class="setting">
+           <!-- Here is the reset button, to reset all UI to default -->
+        <button id="reset-button" class="reset-button">Reset</button>
+    </div>
+    <div class="setting">
+         <!-- Here is the save button that saves the UI that was chosen -->
+        <button id="save-button" class="reset-button">Save</button>
+           <!-- Here is the save confirmation message, that lets the user know that the UI customization was saved.
+            this is the success message color in green-->
+        <p id="save-confirmation" style="color: limegreen; margin-top: 10px; display: none;">Settings saved!</p>
+    </div>
+</div>
+  </div>
+  <script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+        applySavedSettings();
+
+        document.getElementById('settings-button').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('settings-popup').classList.toggle('open');
+        });
+        document.getElementById('close-popup').addEventListener('click', function() {
+            document.getElementById('settings-popup').classList.remove('open');
+        });
+        var resetButton = document.getElementById('reset-button');
+        resetButton.addEventListener('click', function() {
+            window.location.reload();
+        });
+        document.getElementById('save-button').addEventListener('click', saveSettings);
+        //This is to apply the save function 
+    function applySavedSettings() {
+            const savedBgColor = localStorage.getItem('bgColor');
+            const savedFontFamily = localStorage.getItem('fontFamily');
+            const savedFontSize = localStorage.getItem('fontSize');
+        
+            if (savedBgColor) {
+                //This is for the save for the background color and the font family
+                changeBackgroundColor(savedBgColor);
+            }
+            if (savedFontFamily) {
+                changeFontFamily(savedFontFamily);
+            }
+            if (savedFontSize) {
+                changeFontSize(savedFontSize);
+            }
+        }
+        document.getElementById('reset-button').addEventListener('click', function() {
+            localStorage.removeItem('bgColor');
+            localStorage.removeItem('fontFamily');
+            localStorage.removeItem('fontSize');
+            resetUI();
+        });
+    });
+    //This is for the save function of the UI customization 
+    function saveSettings() {
+        const bgColor = document.getElementById('bg-color').value;
+        const fontFamily = document.getElementById('font-family').value;
+        const fontSize = document.getElementById('font-size').value;
+    
+        localStorage.setItem('bgColor', bgColor);
+        localStorage.setItem('fontFamily', fontFamily);
+        localStorage.setItem('fontSize', fontSize);
+    
+        const confirmationMessage = document.getElementById('save-confirmation');
+        confirmationMessage.textContent = "Settings saved!";
+        confirmationMessage.style.display = "block";
+    
+        setTimeout(() => {
+            confirmationMessage.style.display = "none";
+        }, 3000); 
+    }
+
+
+        //Function to change background color
+        function changeBackgroundColor(color) {
+            document.body.style.backgroundColor = color;
+        }
+
+        //Function to change font color
+        function changeFontColor(color) {
+            document.body.style.color = color;
+        }
+
+        //Function to change font family
+        function changeFontFamily(font) {
+            document.body.style.fontFamily = font;
+        }
+
+        function changeFontSize(size) {
+        document.body.style.fontSize = size;
+        document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, label, button, input').forEach(element => {
+            element.style.fontSize = size;
+        });
+        
+        // Adjust the padding on the password input
+        var passwordField = document.getElementById("password");
+        var eyeIcon = document.getElementById("eye-icon");
+        passwordField.style.paddingRight = eyeIcon.offsetWidth + 'px';
+
+        // Change font size for specific elements
+        document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, label, button').forEach(element => {
+            element.style.fontSize = size;
+        });
+    }
+    function resetUI() {
+        //This is the function that resets the UI back to default
+        const defaultBgColor = '#222'; 
+        const defaultFontFamily = 'Arial, sans-serif'; 
+        const defaultFontSize = '16px'; 
+    
+        changeBackgroundColor(defaultBgColor);
+        document.getElementById('bg-color').value = defaultBgColor;
+        changeFontFamily(defaultFontFamily);
+        document.getElementById('font-family').value = defaultFontFamily;
+        changeFontSize(defaultFontSize);
+        document.getElementById('font-size').value = defaultFontSize;    
+        document.getElementById('save-confirmation').style.display = "none";
+    }
+    </script>
+</html>
+

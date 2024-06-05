@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Styles for the page and the title -->
+    <title>Email Verification Complete</title>
+    
+    <style>
+        
+        body {
+            background-color: black; /* This is for the background color */
+            color: white; /* This is for the text color */
+            font-size: 28px; /*This is for the font size */
+            font-family: monospace; /* This is for the font family */
+            text-align: center; /* This is to center-align the text */
+            margin: 0;
+            padding: 0;
+            height: 100vh; /*This is for the full height */
+            display: flex; 
+            flex-direction: column; /*The content will be aligned in a column */
+            justify-content: center; /*This is to display the content in the center */
+        }
+        h1 {
+            font-size: 42px; /* Font size for the heading*/
+        }
+        p {
+            margin-top: 20px; /*This will add margins to the top of the paragraphs*/
+        }
+        a {
+            color: blue; /* This is the link color */
+        }
+    </style>
+    <script>
+        //This is for the redirection to the login page
+        //after the email verification process has been completed successfully
+        function redirectAfterDelay() {
+            setTimeout(function() {
+                window.location.href = '/login';  
+                //This is for the 5 second count to redirection to the login page
+            }, 5000); 
+        }
+    </script>
+</head>
+
+<body onload="redirectAfterDelay()">
+    <!--This is what is going to show up to the user-->
+    <h1>Email verification complete!</h1>
+<!--This is for the redirection of the login page-->
+    <p>You will be redirected to the login page in 5 seconds. If the redirection does not happen, <a href="/login">click here</a> to login.</p>
+</body>
+</html>

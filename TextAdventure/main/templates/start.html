@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome to Shattered Rails</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/*These are the css styles for the page */
+@keyframes pulseBackground {
+  0%, 100% {
+    box-shadow: 0 0 10px #e0a96d, 0 0 20px #e0a96d, 0 0 30px #e0a96d;
+    border-color: #e0a96d;
+  }
+  50% {
+    box-shadow: 0 0 20px #d98b55, 0 0 40px #d98b55, 0 0 60px #d98b55;
+    border-color: #d98b55;
+  }
+}
+/* These are the general styles of the page */
+
+html, body {
+    height: 100%; 
+    min-height: 100%; 
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+    background-color: black;
+    color: #e0a96d;
+    overflow-x: hidden; 
+    
+}
+/* This is what the main content is*/
+.cyber-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; 
+    
+}
+/* This is for the styling for the main text */
+.cyber-text {
+    font-size: 52px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #e0a96d;
+    
+}
+
+.game-card {
+    background-color: #121212;
+    padding: 20px;
+    margin-top: 20px;
+    border: 2px solid #e0a96d;
+    animation: pulseBackground 2s infinite;
+}
+/* This is for the styling for game title */
+.game-title {
+    color: #e0a96d;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+/* This is for the styling for game description */
+.game-description {
+    color: #e0a96d;
+    margin-bottom: 20px;
+}
+/*This is for the styling for the start button */
+.start-button {
+    padding: 10px 20px;
+    font-size: 20px;
+    background-color: #d98b55;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.start-button:hover {
+    background-color: #b77948;
+}
+
+
+</style>
+</head>
+<body>
+    
+    <div class="cyber-container">
+        <h1 class="cyber-text">Welcome to Shattered Rails: Shattered Inceptions<br>Are you ready to begin?</h1>
+        <div class="game-card">
+            <!-- This is the game card with mission briefing -->
+            <h2 class="game-title">Mission Briefing</h2>
+            <p class="game-description">Your journey starts now in Shattered Rails. You will be on a mission and will decide what choices to make.</p>
+             <!--This is for the button to start the mission -->
+            <button class="start-button" onclick="startGame()">Start Mission</button>
+        </div>
+    </div>
+        <!-- This is the javaScript for starting the game -->
+
+    <script>
+        
+        function startGame() {
+            // Redirect to /game
+            window.location.href = "{% url 'game' %}";
+        }
+    </script>
+</body>
+</html>

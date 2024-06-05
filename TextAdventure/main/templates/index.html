@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+
+        .reset-button {
+            margin-top: 20px;
+            padding: 15px 20px;
+            color: white;
+            background-color: black; 
+            border: 1px solid #ccc; 
+            border-radius: 4px;
+            cursor: pointer;
+            display: block; 
+            font-size: 24px;
+        }
+            
+        .settings-popup {
+            position: fixed;
+            top: 0;
+            right: -400px; 
+            width: 300px;
+            height: 100%;
+            background-color: black; 
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            transition: right 0.5s;
+            z-index: 1000;
+            padding: 20px; 
+            font-size: 18px; 
+            overflow-y: auto;
+            color: #ecf0f1; 
+        }
+        
+        .settings-popup.open {
+            right: 0;
+        }
+        
+        .settings-popup h2 {
+            color: #ecf0f1;
+            font-size: 24px; 
+            margin-bottom: 20px; 
+            text-align: center; 
+        }
+        
+        .settings-popup label {
+            display: block;
+            margin-bottom: 10px;
+            color: #ecf0f1; 
+        }
+        
+        .settings-popup input[type="color"],
+        .settings-popup select {
+            display: block;
+            width: 100%; 
+            margin-bottom: 20px; 
+            border: 1px solid #34495e;
+            background-color: #34495e;
+            color: #ecf0f1; 
+            padding: 10px; 
+            border-radius: 4px; 
+        }
+        
+        .settings-popup .button {
+            background-color: #16a085; 
+            color: white; 
+            text-transform: uppercase; 
+            font-weight: bold; 
+            border: none; 
+            border-radius: 4px; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            margin-bottom: 20px; 
+            width: 100%; 
+            box-sizing: border-box; 
+            transition: background-color 0.3s ease; 
+        }
+        
+        .settings-popup .button:hover {
+            background-color: #1abc9c; 
+        }
+        
+        .settings-popup .close-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #c0392b; 
+            cursor: pointer;
+            font-size: 24px;
+        }
+        .close-button {
+            color: black;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        body {
+            margin: 0; 
+            font-family: monospace;
+            background-color: rgb(15, 19, 27);; 
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .menu-bar {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            list-style: none;
+        }
+
+        .menu-bar a {
+    color: white;
+    padding: 20px 40px;
+    text-decoration: none;
+    margin: 0 10px;
+    border: 2px solid white;
+    border-radius: 40px;
+    transition: background-color 0.3s;
+    font-size: 24px;
+}
+
+.menu-bar a:hover {
+    background-color: #007bff;
+}
+
+        h1 {
+            font-size: 5em;
+            margin: 0.5em 0;
+        }
+
+        .shattered-rails-text 
+        {
+        font-size: 2.3em;
+        margin-bottom: 0.5em;
+        margin-left: 100px;
+        margin-right: 100px;
+        margin-bottom: 50px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .button-container a 
+    {
+    display: inline-block;
+    margin: 0 10px;
+    text-decoration: none;
+    color: white;
+    padding: 20px 40px;
+    background-color: orange;
+    border-radius: 40px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    font-size: 24px;
+    }
+
+        .button-container a:hover {
+            background-color: #e69500;
+        }
+
+        .scrollable-content {
+            /*overflow-y: scroll;*/
+            flex: 1;
+        }
+
+        .arrow-down {
+            font-size: 70px; 
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.5s ease;
+            animation: arrowBounce 1.5s infinite alternate;
+            position: relative; 
+        }
+
+        @keyframes arrowBounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(20px); }
+        }
+        
+        #ticTacToeContainer .card 
+        {
+        background: #333;
+        width: 900px;
+        height: 400px;
+        margin: 0 auto;
+        overflow: hidden;
+        border: 1px solid rgba(137, 128, 134, 0.75);
+        box-shadow: 0 0 20px rgba(137, 128, 134, 0.75); 
+        cursor: pointer;
+        font-size: 1.5em;
+        transition: transform 0.1s ease-out, box-shadow 0.5s ease;
+        }
+        #status {
+    font-size: 1.5em;
+}
+
+        #ticTacToeContainer .card:hover 
+        {
+        transform: translateY(-10px); 
+        box-shadow: 0 0 30px rgb(100, 163, 218); 
+        }
+
+        .card-container {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            margin: 50px auto;
+            
+            opacity: 0; 
+            transition: opacity 2s ease;
+        }
+
+        .card {
+    background: #333;
+    width: 900px; 
+    height: 550px;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 1px solid #69adf7;
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.75); 
+    cursor: pointer;
+    transition: transform 0.1s ease-out, box-shadow 0.5s ease;
+}
+
+.card h3, .card p {
+    font-size: 1.6em; 
+}
+
+.card:hover {
+    transform: translateY(-10px); 
+    box-shadow: 0 0 30px rgb(100, 163, 218); 
+}
+
+.card:nth-child(1) {
+    border-color: #f4b967; 
+    box-shadow: 0 0 20px rgba(255, 170, 51, 0.75); 
+}
+
+.card:nth-child(1):hover {
+    box-shadow: 0 0 30px rgba(255, 170, 51, 1); 
+}
+
+.card:nth-child(2) {
+    border-color: rgba(137, 128, 134, 0.75); 
+    box-shadow: 0 0 20px rgba(137, 128, 134, 0.75); 
+}
+
+.card:nth-child(2):hover {
+    box-shadow: 0 0 30px rgba(137, 128, 134, 0.75); 
+}
+
+
+.card.flipped {
+    animation: flipAnimation 1s forwards;
+}
+@keyframes flipAnimation {
+    0% { transform: rotateY(0deg); }
+    50% { transform: rotateY(180deg); }
+    100% { transform: rotateY(360deg); }
+}
+        .content {
+            padding: 20px;
+            justify-content: center;
+            font-size: 1.15em;
+        }
+
+        .date, .title, .excerpt, .read-more {
+            transform: skewY(0deg); 
+        }
+
+        .read-more {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px;
+            background: #ffaa33;
+            color: #1a1a1a;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .read-more:hover {
+            background: #efb762;
+            color: #ffddaa;
+        }
+
+        #board 
+        {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .row 
+        {
+            display: flex;
+        }
+
+        .cell 
+        {
+            width: 33.33%;
+            height: 100px;
+            background-color: #333;
+            border: 1px solid white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            cursor: pointer;
+        }
+
+        .hidden 
+        {
+            display: none;
+        }
+        #hamburger-icon {
+            display: none;
+            cursor: pointer;
+            flex-direction: column;
+            gap: 5px;
+            padding: 10px;
+        }
+        
+        #hamburger-icon span {
+            display: block;
+            width: 30px;
+            height: 3px;
+            background-color: white;
+        }
+        
+        #menu-items {
+            display: flex; 
+            gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            #hamburger-icon {
+                display: flex; 
+            }
+            
+            #menu-items {
+                display: none; 
+                flex-direction: column;
+                position: absolute;
+                background-color: #333;
+                top: 60px;
+                right: 0;
+                width: 100%;
+            }
+            
+            .menu-bar {
+                justify-content: space-between;
+            }
+            
+            #menu-items.active {
+                display: flex; 
+            }
+        }
+        
+        
+    </style>
+</head>
+<body>
+
+    <div class="menu-bar">
+        <div id="hamburger-icon" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div id="menu-items">
+            {% if not user.is_authenticated %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+            {% else %}
+                <a href="{% url 'index_2' %}">Game Selection</a>
+                <a href="{% url 'logout' %}">Logout</a>
+            {% endif %}
+            <a href="#" id="settings-button" class="menu-item">Settings</a>
+        </div>
+        
+        <div id="settings-popup" class="settings-popup">
+            <button id="close-popup" class="close-popup">&times;</button>
+            <h2>Settings</h2>
+            
+            <div class="setting">
+                <label for="bg-color">Background Color:</label>
+                <input type="color" id="bg-color" onchange="changeBackgroundColor(this.value)" value="#222">
+            </div>
+            
+            <div class="setting">
+                <label for="font-family">Font Family:</label>
+                <select id="font-family" onchange="changeFontFamily(this.value)">
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="Times New Roman, serif">Times New Roman</option>
+                    <option value="Courier New, monospace">Courier New</option>
+                </select>
+            </div>
+            
+            <div class="setting">
+                <label for="font-size">Font Size:</label>
+                <select id="font-size" onchange="changeFontSize(this.value)">
+                    <option value="12px">12px</option>
+                    <option value="14px">14px</option>
+                    <option value="16px">16px</option>
+                    <option value="18px">18px</option>
+                    <option value="19px">19px</option>
+                    <option value="20px">20px</option>
+                    <option value="21px">21px</option>
+                    <option value="22px">22px</option>
+                </select>
+            </div>
+            <div class="setting">
+                <button id="reset-button" class="reset-button">Reset</button>
+            </div>
+            <div class="setting">
+                <button id="save-button" class="reset-button">Save</button>
+                <p id="save-confirmation" style="color: limegreen; margin-top: 10px; display: none;">Settings saved!</p>
+            </div>
+        </div>
+          </div>
+
+    <div class="scrollable-content">
+        <h1>Welcome to Shattered Rails</h1>
+        <h2 class="shattered-rails-text">
+            Explore the Shattered Rails Universe! See 2 unique text-based adventure games, with gameplay ranging from strategical path selection and choice making skills, to braving on difficult and perhaps occult monsters/beings in the battle feature! Experience both worlds which are linked to each other and see the path that you have chosen for yourself, not the tracks that destiny has made you travel on!
+        </h2>
+        <div class="button-container">
+            <a href="#" class="cta-button" onclick="revealContent()">Read More</a>
+        </div>
+        
+        <div class="card-container">
+            <div class="card">
+                <div class="content">
+                    <div class="title">Game 1</div>
+                    <div class="excerpt">                <h3>Shattered Rails: Shattered Inceptions</h3>
+                        <p>Embark on a thrilling adventure, on the Shattered Rails Express, which mysteriously crashes in a strange forest. What are the circumstances of the crash? What are the creatures in this forest? All will be revealed in due time as you explore and make choices to alter the path of the story!</p></div>
+                </div>
+            </div>
+
+            <div class="card" id="tipsCard" onclick="nextTip()">
+                <div class="content">
+                    <div class="title">TIPS!</div>
+                    <div class="excerpt">
+                        <h3>Game Help Tips</h3>
+                        <p id="tipContent">Click to reveal a tip!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="content">
+                    <div class="title">Game 2</div>
+                    <div class="excerpt">                <h3>Shattered Rails: The Requiem of Shattering</h3>
+                        <p>The events of the first game have turned you into a warrior. Take on all of the enemies and the aftermath of the Shattered Rails universe as you bring justice and truth to this world! Experience the new and improved battle system and fight a colorful cast of enemies in order to bring peace and stop injustice! Shatter on, brave soul!</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="ticTacToeContainer" class="card-container">
+            <div id="ticTacToeGame" class="card">
+                <div class="content">
+                    <div class="title">Tic Tac Toe</div>
+                    <div class="excerpt">
+                        <div id="board">
+                            <div class="row">
+                                <div class="cell" onclick="makeMove(0, 0)"></div>
+                                <div class="cell" onclick="makeMove(0, 1)"></div>
+                                <div class="cell" onclick="makeMove(0, 2)"></div>
+                            </div>
+                            <div class="row">
+                                <div class="cell" onclick="makeMove(1, 0)"></div>
+                                <div class="cell" onclick="makeMove(1, 1)"></div>
+                                <div class="cell" onclick="makeMove(1, 2)"></div>
+                            </div>
+                            <div class="row">
+                                <div class="cell" onclick="makeMove(2, 0)"></div>
+                                <div class="cell" onclick="makeMove(2, 1)"></div>
+                                <div class="cell" onclick="makeMove(2, 2)"></div>
+                            </div>
+                        </div>
+                        <div id="status"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script type="text/javascript">
+        var tips = 
+        [
+            "Tip 1: The Magician type in Game 2 has the highest MP storage!",
+            "Tip 2: In Game 1, you should try to see what'll happen if you stay for help...",
+            "Tip 3: You may hear some strange voices in Game 1, be sure to head their words...",
+            "Tip 4: In Game 2 the Berserker type is the strongest attack!",
+            "Tip 5: In Game 2 try talking to the Queens/Kings. What you have to say might change the outcome of your battle!",
+            "Tip 6: In Game 1 there are 3 types of endings, good/bad/special endings. Try going through all paths to see all types of endings!",
+            "Tip 7: In Game 2, there may or may not be characters who were in the first game...",
+            "Tip 8: In both games, you can use the customization/accomodations options in order to view the content of the terminal differently!",
+            "Tip 9: In both games, you can speed up the text/slow it down/pause the text!",
+            "Tip 10: If you see a rabbit, you might want to hear what it says!"
+
+        ];
+
+        var currentTipIndex = 0;
+    var tipContent = document.getElementById('tipContent');
+
+    function nextTip() {
+        var card = document.getElementById('tipsCard');
+        card.classList.add('flipped');
+        setTimeout(function() {
+            tipContent.textContent = tips[currentTipIndex];
+            currentTipIndex = (currentTipIndex + 1) % tips.length;
+            card.classList.remove('flipped');
+        }, 1000); 
+    }
+
+    var currentPlayer = 'X';
+    var board = [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+    ];
+
+    function makeMove(row, col) {
+        if (board[row][col] === '') {
+            board[row][col] = currentPlayer;
+            document.getElementById('board').children[row].children[col].textContent = currentPlayer;
+            if (checkWinner(currentPlayer)) {
+                document.getElementById('status').textContent = currentPlayer + ' wins!';
+                setTimeout(resetBoard, 2000);;
+            } else if (checkDraw()) {
+                document.getElementById('status').textContent = 'Draw!';
+                setTimeout(resetBoard, 2000);;
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            }
+        }
+    }
+
+    function checkWinner(player) {
+        for (var i = 0; i < 3; i++) {
+            if (board[i][0] === player && board[i][1] === player && board[i][2] === player) {
+                return true;
+            }
+            if (board[0][i] === player && board[1][i] === player && board[2][i] === player) {
+                return true;
+            }
+        }
+        if (board[0][0] === player && board[1][1] === player && board[2][2] === player) {
+            return true;
+        }
+        if (board[0][2] === player && board[1][1] === player && board[2][0] === player) {
+            return true;
+        }
+        return false;
+    }
+
+    function checkDraw() {
+        for (var i = 0; i < 3; i++) {
+            for (var j = 0; j < 3; j++) {
+                if (board[i][j] === '') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function resetBoard() {
+        for (var i = 0; i < 3; i++) {
+            for (var j = 0; j < 3; j++) {
+                board[i][j] = '';
+            }
+        }
+        var cells = document.querySelectorAll('.cell');
+        cells.forEach(function(cell) {
+            cell.textContent = '';
+        });
+        document.getElementById('status').textContent = '';
+    }
+
+    function revealContent() {
+        var cardContainer = document.querySelector('.card-container');
+        var ticTacToeContainer = document.getElementById('ticTacToeContainer');
+
+        cardContainer.style.opacity = 1;
+        ticTacToeContainer.style.opacity = 1;
+    }
+
+    function revealCards() {
+        document.querySelector('.card-container').style.opacity = 1;
+    }
+</script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            applySavedSettings();
+            document.getElementById('settings-button').addEventListener('click', function(event) {
+                event.preventDefault();
+                document.getElementById('settings-popup').classList.toggle('open');
+            });
+            document.getElementById('close-popup').addEventListener('click', function() {
+                document.getElementById('settings-popup').classList.remove('open');
+            });
+            var resetButton = document.getElementById('reset-button');
+            resetButton.addEventListener('click', function() {
+                window.location.reload();
+            });
+            document.getElementById('save-button').addEventListener('click', saveSettings);
+            function applySavedSettings() {
+                const savedBgColor = localStorage.getItem('bgColor');
+                const savedFontFamily = localStorage.getItem('fontFamily');
+                const savedFontSize = localStorage.getItem('fontSize');
+            
+                if (savedBgColor) {
+                    changeBackgroundColor(savedBgColor);
+                }
+                if (savedFontFamily) {
+                    changeFontFamily(savedFontFamily);
+                }
+                if (savedFontSize) {
+                    changeFontSize(savedFontSize);
+                }
+            }
+            document.getElementById('reset-button').addEventListener('click', function() {
+                localStorage.removeItem('bgColor');
+                localStorage.removeItem('fontFamily');
+                localStorage.removeItem('fontSize');
+                resetUI();
+            });
+        });
+    function saveSettings() {
+        const bgColor = document.getElementById('bg-color').value;
+        const fontFamily = document.getElementById('font-family').value;
+        const fontSize = document.getElementById('font-size').value;
+    
+        localStorage.setItem('bgColor', bgColor);
+        localStorage.setItem('fontFamily', fontFamily);
+        localStorage.setItem('fontSize', fontSize);
+    
+        const confirmationMessage = document.getElementById('save-confirmation');
+        confirmationMessage.textContent = "Settings saved!";
+        confirmationMessage.style.display = "block";
+    
+        setTimeout(() => {
+            confirmationMessage.style.display = "none";
+        }, 3000); 
+    }
+    </script>
+    <script>
+        function changeBackgroundColor(color) {
+            document.body.style.backgroundColor = color;
+        }
+
+        //Function to change font color
+        function changeFontColor(color) {
+            document.body.style.color = color;
+        }
+
+        //Function to change font family
+        function changeFontFamily(font) {
+            document.body.style.fontFamily = font;
+        }
+
+        function changeFontSize(size) {
+        document.body.style.fontSize = size;
+        // Change font size for specific elements
+        document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, label, button').forEach(element => {
+            element.style.fontSize = size;
+        });
+    }
+    function resetUI() {
+        const defaultBgColor = '#222'; 
+        const defaultFontFamily = 'Arial, sans-serif'; 
+        const defaultFontSize = '16px'; 
+    
+        changeBackgroundColor(defaultBgColor);
+        document.getElementById('bg-color').value = defaultBgColor;
+        changeFontFamily(defaultFontFamily);
+        document.getElementById('font-family').value = defaultFontFamily;
+        changeFontSize(defaultFontSize);
+        document.getElementById('font-size').value = defaultFontSize;    
+        document.getElementById('save-confirmation').style.display = "none";
+    }
+    function toggleMenu() {
+        var menuItems = document.getElementById("menu-items");
+        if (menuItems.classList.contains("active")) {
+            menuItems.classList.remove("active");
+        } else {
+            menuItems.classList.add("active");
+        }
+    }
+    </script>
+</body>
+</html>
